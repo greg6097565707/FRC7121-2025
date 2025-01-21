@@ -19,6 +19,8 @@ import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
 import frc.robot.Constants.DriveConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
 import com.studica.frc.AHRS.BoardYawAxis;
@@ -28,25 +30,45 @@ import com.studica.frc.AHRS.BoardAxis;;
 
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
+  public final TalonFX talonFrontLeft = new TalonFX(DriveConstants.kFrontLeftDrivingCanId);
   private final MAXSwerveModule m_frontLeft = new MAXSwerveModule(
-      DriveConstants.kFrontLeftDrivingCanId,
+    talonFrontLeft,
       DriveConstants.kFrontLeftTurningCanId,
       DriveConstants.kFrontLeftChassisAngularOffset);
 
-  private final MAXSwerveModule m_frontRight = new MAXSwerveModule(
-      DriveConstants.kFrontRightDrivingCanId,
-      DriveConstants.kFrontRightTurningCanId,
-      DriveConstants.kFrontRightChassisAngularOffset);
+      public final TalonFX talonFrontRight = new TalonFX(DriveConstants.kFrontRightDrivingCanId);
+    private final MAXSwerveModule m_frontRight = new MAXSwerveModule(
+        talonFrontRight, 
+        DriveConstants.kFrontRightTurningCanId, 
+        DriveConstants.kFrontRightChassisAngularOffset
+    );
+    public final TalonFX talonRearLeft = new TalonFX(DriveConstants.kRearLeftDrivingCanId);
+    private final MAXSwerveModule m_rearLeft = new MAXSwerveModule(
+        talonRearLeft, 
+        DriveConstants.kRearLeftTurningCanId, 
+        DriveConstants.kBackLeftChassisAngularOffset
+    );
+    public final TalonFX talonRearRight = new TalonFX(DriveConstants.kRearRightDrivingCanId);
+    private final MAXSwerveModule m_rearRight = new MAXSwerveModule(
+        talonRearRight, 
+        DriveConstants.kRearRightTurningCanId, 
+        DriveConstants.kBackRightChassisAngularOffset
+    );
 
-  private final MAXSwerveModule m_rearLeft = new MAXSwerveModule(
-      DriveConstants.kRearLeftDrivingCanId,
-      DriveConstants.kRearLeftTurningCanId,
-      DriveConstants.kBackLeftChassisAngularOffset);
+  // private final MAXSwerveModule m_frontRight = new MAXSwerveModule(
+  //     DriveConstants.kFrontRightDrivingCanId,
+  //     DriveConstants.kFrontRightTurningCanId,
+  //     DriveConstants.kFrontRightChassisAngularOffset);
 
-  private final MAXSwerveModule m_rearRight = new MAXSwerveModule(
-      DriveConstants.kRearRightDrivingCanId,
-      DriveConstants.kRearRightTurningCanId,
-      DriveConstants.kBackRightChassisAngularOffset);
+  // private final MAXSwerveModule m_rearLeft = new MAXSwerveModule(
+  //     DriveConstants.kRearLeftDrivingCanId,
+  //     DriveConstants.kRearLeftTurningCanId,
+  //     DriveConstants.kBackLeftChassisAngularOffset);
+
+  // private final MAXSwerveModule m_rearRight = new MAXSwerveModule(
+  //     DriveConstants.kRearRightDrivingCanId,
+  //     DriveConstants.kRearRightTurningCanId,
+  //     DriveConstants.kBackRightChassisAngularOffset);
 
   // The gyro sensor
   // private final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
