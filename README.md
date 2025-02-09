@@ -2,18 +2,17 @@
 
 See [the online changelog](https://github.com/REVrobotics/MAXSwerve-Java-Template/blob/main/CHANGELOG.md) for information about updates to the template that may have been released since you created your project.
 
-## Description
+## swerve
 
-A template project for an FRC swerve drivetrain that uses REV MAXSwerve Modules.
+FRC 7121 2025 code 
+maxswerve drive base 
+4x kraken x60
+4x neo 550 turining
 
-Note that this is meant to be used with a drivetrain composed of four MAXSwerve Modules, each configured with two SPARKS MAX, a NEO as the driving motor, a NEO 550 as the turning motor, and a REV Through Bore Encoder as the absolute turning encoder.
 
-To get started, make sure you have calibrated the zero offsets for the absolute encoders in the Hardware Client using the `Absolute Encoder` tab under the associated turning SPARK MAX devices.
+## elevator
 
-## Prerequisites
-
-* SPARK MAX Firmware v25.0.0
-* REVLib v2025.0.0
+2x neo V1.1
 
 ## Configuration
 
