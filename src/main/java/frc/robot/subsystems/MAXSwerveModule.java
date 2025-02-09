@@ -21,6 +21,8 @@ import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.VelocityDutyCycle;
+import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -56,6 +58,7 @@ public class MAXSwerveModule {
 
   private double m_chassisAngularOffset = 0;
   private SwerveModuleState m_desiredState = new SwerveModuleState(0.0, new Rotation2d());
+  private VelocityDutyCycle m_velocityPID = new VelocityDutyCycle(0);
 
   /**
    * Constructs a MAXSwerveModule and configures the driving and turning motor,
@@ -82,7 +85,14 @@ public class MAXSwerveModule {
 
     m_chassisAngularOffset = chassisAngularOffset;
     m_desiredState.angle = new Rotation2d(m_turningEncoder.getPosition());
-    m_drivingTalonFX.setNeutralMode(NeutralModeValue.Brake);
+    // m_drivingTalonFX.setNeutralMode(NeutralModeValue.Brake);
+    var TalonFXConfigs = new TalonFXConfiguration();
+    TalonFXConfigs.Slot0.kP = ModuleConstants.kDrivingP;
+    TalonFXConfigs.Slot0.kI = ModuleConstants.kDrivingI;
+    TalonFXConfigs.Slot0.kD = ModuleConstants.kDrivingD;
+    TalonFXConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    TalonFXConfigs.Feedback.SensorToMechanismRatio = ModuleConstants.kDrivingMotorReduction / ModuleConstants.kWheelCircumferenceMeters;
+    m_drivingTalonFX.getConfigurator().apply(TalonFXConfigs);
     // m_drivingEncoder.setPosition(0);
   }
 
@@ -94,13 +104,12 @@ public class MAXSwerveModule {
   public SwerveModuleState getState() {
     // Apply chassis angular offset to the encoder position to get the position
     // relative to the chassis.
-    return new SwerveModuleState(Conversions.falconToMPS(m_drivingTalonFX.getVelocity().getValueAsDouble(), 
-    ModuleConstants.kWheelCircumferenceMeters, ModuleConstants.kDrivingMotorReduction),
+    return new SwerveModuleState(m_drivingTalonFX.getVelocity().getValueAsDouble(),
         new Rotation2d(m_turningEncoder.getPosition() - m_chassisAngularOffset));
   }
-  public double getDriveMotorPosition() {
-    return (m_drivingTalonFX.getPosition().getValueAsDouble() *ModuleConstants.kWheelCircumferenceMeters)/ModuleConstants.kDrivingMotorReduction;
-  }
+  // public double getDriveMotorPosition() {
+  //   return (m_drivingTalonFX.getPosition().getValueAsDouble() *ModuleConstants.kWheelCircumferenceMeters)/ModuleConstants.kDrivingMotorReduction;
+  // }
 
   /**
    * Returns the current position of the module.
@@ -111,10 +120,12 @@ public class MAXSwerveModule {
     // Apply chassis angular offset to the encoder position to get the position
     // relative to the chassis.
     return new SwerveModulePosition(
-        getDriveMotorPosition(),
+        m_drivingTalonFX.getPosition().getValueAsDouble(),
         new Rotation2d(m_turningEncoder.getPosition() - m_chassisAngularOffset));
   }
-
+public double cosineScale(Rotation2d currentAngle, Rotation2d desiredAngle){
+  return desiredAngle.minus(currentAngle).getCos();
+}
   /**
    * Sets the desired state for the module.
    *
@@ -128,17 +139,23 @@ public class MAXSwerveModule {
 
     // Optimize the reference state to avoid spinning further than 90 degrees.
     correctedDesiredState.optimize(new Rotation2d(m_turningEncoder.getPosition()));
-    setKrakenSpeed(correctedDesiredState);
+
+    m_drivingTalonFX.setControl(
+      m_velocityPID
+      .withVelocity(correctedDesiredState.speedMetersPerSecond * Math.abs(cosineScale(Rotation2d.fromRadians(m_turningEncoder.getPosition()), correctedDesiredState.angle)))
+      .withEnableFOC(false)
+    );
+    // setKrakenSpeed(correctedDesiredState);
     // Command driving and turning SPARKS towards their respective setpoints.
     // m_drivingClosedLoopController.setReference(correctedDesiredState.speedMetersPerSecond, ControlType.kVelocity);
     m_turningClosedLoopController.setReference(correctedDesiredState.angle.getRadians(), ControlType.kPosition);
 
     m_desiredState = desiredState;
   }
-  public void setKrakenSpeed(SwerveModuleState desiredState) {
-    double percentOutput = desiredState.speedMetersPerSecond;
-      m_drivingTalonFX.set(percentOutput);
-  }
+  // public void setKrakenSpeed(SwerveModuleState desiredState) {
+  //   double percentOutput = desiredState.speedMetersPerSecond;
+  //     m_drivingTalonFX.set(percentOutput);
+  // }
 
   /** Zeroes all the SwerveModule encoders. */
   public void resetEncoders() {
