@@ -126,6 +126,9 @@ public final class Constants {
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
     public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
 
+    public static final double kSwerveDiscreteTimestep = 0.02;
+
+
     public static final double kPXController = 1;
     public static final double kPYController = 1;
     public static final double kPThetaController = 1;
@@ -138,4 +141,19 @@ public final class Constants {
   public static final class NeoMotorConstants {
     public static final double kFreeSpeedRpm = 6000;
   }
+
+  public static final class ElevatorConstants {
+    public static final int leaderID = 9;
+    public static final int followerID = 10;
+  }
+
+  public static final class HorizontalElevatorConstants {
+    public static final int hElevatorMotorID = 11;
+  }
+
+  public static final class IntakeConstants {
+    public static final int rightMotorID = 12;
+    public static final int leftMotorID = 13;
+  }
+
 }
