@@ -53,7 +53,7 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
 
-    autoChooser = AutoBuilder.buildAutoChooser("Example");
+    autoChooser = AutoBuilder.buildAutoChooser("Example Au");
 
 
 
@@ -87,6 +87,9 @@ public class RobotContainer {
 
     new JoystickButton(m_driverController, XboxController.Button.kA.value)
       .onTrue(elevatorSubsystem.raiseElevatorTop());
+
+    new JoystickButton(m_driverController, XboxController.Button.kX.value)
+      .onTrue(elevatorSubsystem.raiseElevatorMid());
 
     new JoystickButton(m_driverController, XboxController.Button.kB.value)
       .onTrue(elevatorSubsystem.lowerElevator());

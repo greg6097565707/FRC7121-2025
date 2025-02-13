@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -49,8 +50,8 @@ public class ElevatorSubsystem extends SubsystemBase {
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
             // Set PID values for position control. We don't need to pass a closed
             // loop slot, as it will default to slot 0.
-            .p(0.08)
-            .i(0)
+            .p(0.013)
+            .i(0.)
             .d(0)
             .outputRange(-1, 1);
             // Set PID values for velocity control in slot 1
@@ -63,13 +64,13 @@ public class ElevatorSubsystem extends SubsystemBase {
         leaderConfig.closedLoop.maxMotion
             // Set MAXMotion parameters for position control. We don't need to pass
             // a closed loop slot, as it will default to slot 0.
-            .maxVelocity(4000)
-            .maxAcceleration(4500)
-            .allowedClosedLoopError(1)
+            .maxVelocity(10000)
+            .maxAcceleration(20000)
+            .allowedClosedLoopError(0.5);
             // Set MAXMotion parameters for velocity control in slot 1
-            .maxAcceleration(500, ClosedLoopSlot.kSlot1)
-            .maxVelocity(6000, ClosedLoopSlot.kSlot1)
-            .allowedClosedLoopError(1, ClosedLoopSlot.kSlot1);
+            // .maxAcceleration(500, ClosedLoopSlot.kSlot1)
+            // .maxVelocity(6000, ClosedLoopSlot.kSlot1)
+            // .allowedClosedLoopError(3, ClosedLoopSlot.kSlot1);
 
 
         /*
@@ -107,7 +108,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     {
         return this.runOnce(
             () -> 
-            closedLoopController.setReference(50, ControlType.kMAXMotionPositionControl,
+            closedLoopController.setReference(40, ControlType.kMAXMotionPositionControl,//50
           ClosedLoopSlot.kSlot0));
     }
 
@@ -132,13 +133,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         return targetPosition;
     }
 
-    public void setTargetPosition(int position)
-    {
-        targetPosition = position;
-    }
 
      @Override
     public void periodic() {
+        SmartDashboard.putNumber("elevator encoder", leader.getEncoder().getPosition());
         
     }
 }

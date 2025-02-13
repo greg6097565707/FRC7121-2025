@@ -8,6 +8,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.motorcontrol.Talon;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -59,6 +61,7 @@ public class MAXSwerveModule {
   private double m_chassisAngularOffset = 0;
   private SwerveModuleState m_desiredState = new SwerveModuleState(0.0, new Rotation2d());
   private VelocityDutyCycle m_velocityPID = new VelocityDutyCycle(0);
+  private SwerveModuleState cModuleState;
 
   /**
    * Constructs a MAXSwerveModule and configures the driving and turning motor,
@@ -91,7 +94,7 @@ public class MAXSwerveModule {
     TalonFXConfigs.Slot0.kI = ModuleConstants.kDrivingI;
     TalonFXConfigs.Slot0.kD = ModuleConstants.kDrivingD;
     TalonFXConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    TalonFXConfigs.Feedback.SensorToMechanismRatio = ModuleConstants.kDrivingMotorReduction / ModuleConstants.kWheelCircumferenceMeters;
+    TalonFXConfigs.Feedback.SensorToMechanismRatio = (ModuleConstants.kDrivingMotorReduction / ModuleConstants.kWheelCircumferenceMeters);
     m_drivingTalonFX.getConfigurator().apply(TalonFXConfigs);
     // m_drivingEncoder.setPosition(0);
   }
@@ -140,9 +143,11 @@ public double cosineScale(Rotation2d currentAngle, Rotation2d desiredAngle){
     // Optimize the reference state to avoid spinning further than 90 degrees.
     correctedDesiredState.optimize(new Rotation2d(m_turningEncoder.getPosition()));
 
+    cModuleState = correctedDesiredState;
+
     m_drivingTalonFX.setControl(
       m_velocityPID
-      .withVelocity(correctedDesiredState.speedMetersPerSecond * Math.abs(cosineScale(Rotation2d.fromRadians(m_turningEncoder.getPosition()), correctedDesiredState.angle)))
+      .withVelocity(correctedDesiredState.speedMetersPerSecond)//* Math.abs(cosineScale(Rotation2d.fromRadians(m_turningEncoder.getPosition()), correctedDesiredState.angle))
       .withEnableFOC(false)
     );
     // setKrakenSpeed(correctedDesiredState);
@@ -151,6 +156,8 @@ public double cosineScale(Rotation2d currentAngle, Rotation2d desiredAngle){
     m_turningClosedLoopController.setReference(correctedDesiredState.angle.getRadians(), ControlType.kPosition);
 
     m_desiredState = desiredState;
+
+
   }
   // public void setKrakenSpeed(SwerveModuleState desiredState) {
   //   double percentOutput = desiredState.speedMetersPerSecond;
@@ -161,6 +168,12 @@ public double cosineScale(Rotation2d currentAngle, Rotation2d desiredAngle){
   public void resetEncoders() {
     m_drivingTalonFX.setPosition(0);
   }
+
+  public SwerveModuleState getMState()
+  {
+    return m_desiredState;
+  }
+
 }
 
 // public class MAXSwerveModule {
