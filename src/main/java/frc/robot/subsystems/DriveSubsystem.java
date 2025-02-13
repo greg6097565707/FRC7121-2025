@@ -67,6 +67,10 @@ public class DriveSubsystem extends SubsystemBase {
   // private final AHRS m_gyro = new AHRS(SPI.Port.kMXP);
   private final AHRS m_gyro = new AHRS(NavXComType.kMXP_SPI);
 
+  //limelight
+  int[] validIDs = {3,4};
+  LimelightHelpers.SetFiducialIDFiltersOverride("limelight", validIDs);
+
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
       DriveConstants.kDriveKinematics,
@@ -133,6 +137,24 @@ public class DriveSubsystem extends SubsystemBase {
             m_rearLeft.getPosition(),
             m_rearRight.getPosition()
         });
+
+      LimelightHelpers.SetRobotOrientation("limelight", m_odometry.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
+      LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
+      if(Math.abs(m_gyro.getRate()) > 720) // if our angular velocity is greater than 720 degrees per second, ignore vision updates
+      {
+        doRejectUpdate = true;
+      }
+      if(mt2.tagCount == 0)
+      {
+        doRejectUpdate = true;
+      }
+      if(!doRejectUpdate)
+      {
+        m_odometry.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
+        m_odometry.addVisionMeasurement(
+            mt2.pose,
+            mt2.timestampSeconds);
+      }
   }
 
   ChassisSpeeds getRobotRelativeSpeeds() {
@@ -164,6 +186,7 @@ public class DriveSubsystem extends SubsystemBase {
   public Pose2d getPose() {
     return m_odometry.getPoseMeters();
   }
+
 
   /**
    * Resets the odometry to the specified pose.
