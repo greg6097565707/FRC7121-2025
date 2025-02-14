@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -46,7 +47,7 @@ public class HorizontalElevatorSubsystem extends SubsystemBase {
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
             // Set PID values for position control. We don't need to pass a closed
             // loop slot, as it will default to slot 0.
-            .p(0.08)
+            .p(0.1)
             .i(0)
             .d(0)
             .outputRange(-1, 1);
@@ -60,8 +61,8 @@ public class HorizontalElevatorSubsystem extends SubsystemBase {
         leaderConfig.closedLoop.maxMotion
             // Set MAXMotion parameters for position control. We don't need to pass
             // a closed loop slot, as it will default to slot 0.
-            .maxVelocity(4000)
-            .maxAcceleration(4500)
+            .maxVelocity(30000)
+            .maxAcceleration(30000)
             .allowedClosedLoopError(1)
             // Set MAXMotion parameters for velocity control in slot 1
             .maxAcceleration(500, ClosedLoopSlot.kSlot1)
@@ -98,7 +99,7 @@ public class HorizontalElevatorSubsystem extends SubsystemBase {
     {
         return this.runOnce(
             () -> 
-            closedLoopController.setReference(20, ControlType.kMAXMotionPositionControl,
+            closedLoopController.setReference(48, ControlType.kMAXMotionPositionControl,
           ClosedLoopSlot.kSlot0));
     }
 
@@ -106,7 +107,7 @@ public class HorizontalElevatorSubsystem extends SubsystemBase {
     {
         return this.runOnce(
             () -> 
-            closedLoopController.setReference(15, ControlType.kMAXMotionPositionControl,
+            closedLoopController.setReference(0, ControlType.kMAXMotionPositionControl,
           ClosedLoopSlot.kSlot0));
     }
 
@@ -122,7 +123,7 @@ public class HorizontalElevatorSubsystem extends SubsystemBase {
 
      @Override
     public void periodic() {
-        System.out.println("encoder position " + encoder.getPosition());
+        SmartDashboard.putNumber("horizontal elevator ", encoder.getPosition());
         
     }
 }

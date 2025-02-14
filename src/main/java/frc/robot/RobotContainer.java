@@ -21,6 +21,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.HorizontalElevatorSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
@@ -39,6 +40,7 @@ public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
+  private final HorizontalElevatorSubsystem horizontalElevatorSubsystem = new HorizontalElevatorSubsystem();
 
   private final SendableChooser<Command> autoChooser;
 
@@ -53,7 +55,7 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
 
-    autoChooser = AutoBuilder.buildAutoChooser("Example Au");
+    autoChooser = AutoBuilder.buildAutoChooser("Example Auto");
 
 
 
@@ -86,13 +88,13 @@ public class RobotContainer {
     //         m_robotDrive));
 
     new JoystickButton(m_driverController, XboxController.Button.kA.value)
-      .onTrue(elevatorSubsystem.raiseElevatorTop());
+      .onTrue(horizontalElevatorSubsystem.forward());
 
     new JoystickButton(m_driverController, XboxController.Button.kX.value)
       .onTrue(elevatorSubsystem.raiseElevatorMid());
 
     new JoystickButton(m_driverController, XboxController.Button.kB.value)
-      .onTrue(elevatorSubsystem.lowerElevator());
+      .onTrue(horizontalElevatorSubsystem.back());
 
   }
 

@@ -36,6 +36,7 @@ import com.studica.frc.AHRS.BoardAxis;;
 // import com.kauailabs.navx.frc.AHRS;
 
 
+
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
   public final TalonFX talonFrontLeft = new TalonFX(DriveConstants.kFrontLeftDrivingCanId);
@@ -120,6 +121,34 @@ public class DriveSubsystem extends SubsystemBase {
       e.printStackTrace();
     }
 
+    SmartDashboard.putData("Swerve",
+        builder -> {
+          builder.setSmartDashboardType("SwerveDrive");
+
+          builder.addDoubleProperty(
+              "Front Left Angle", () -> m_frontLeft.getPosition().angle.getRadians(), null);
+          builder.addDoubleProperty(
+              "Front Left Velocity", () -> m_frontLeft.getMState().speedMetersPerSecond, null);
+
+          builder.addDoubleProperty(
+              "Front Right Angle", () -> m_frontRight.getPosition().angle.getRadians(), null);
+          builder.addDoubleProperty(
+              "Front Right Velocity", () ->m_frontRight.getMState().speedMetersPerSecond, null);
+
+          builder.addDoubleProperty(
+              "Back Left Angle", () -> m_rearLeft.getPosition().angle.getRadians(), null);
+          builder.addDoubleProperty(
+              "Back Left Velocity", () -> m_rearLeft.getMState().speedMetersPerSecond, null);
+
+          builder.addDoubleProperty(
+              "Back Right Angle", () -> m_rearRight.getPosition().angle.getRadians(), null);
+          builder.addDoubleProperty(
+              "Back Right Velocity", () -> m_rearRight.getMState().speedMetersPerSecond, null);
+
+          builder.addDoubleProperty(
+              "Robot Angle", () -> getTrueHeading(), null);
+        });
+
 
   }
 
@@ -135,11 +164,11 @@ public class DriveSubsystem extends SubsystemBase {
             m_rearRight.getPosition()
         });
 
-    SmartDashboard.putNumber("fl corrected speed", m_frontLeft.getMState().speedMetersPerSecond);
-    SmartDashboard.putNumber("fr corrected speed", m_frontRight.getMState().speedMetersPerSecond);
-    SmartDashboard.putNumber("rl corrected speed", m_rearLeft.getMState().speedMetersPerSecond);
-    SmartDashboard.putNumber("rr corrected speed", m_rearRight.getMState().speedMetersPerSecond);
-    SmartDashboard.putNumber("control mode", talonFrontRight.getControlMode().getValueAsDouble());
+
+    
+
+    // in DriveSubsystem.java
+    
 
   }
 
