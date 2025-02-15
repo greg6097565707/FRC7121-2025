@@ -50,27 +50,27 @@ public class ElevatorSubsystem extends SubsystemBase {
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
             // Set PID values for position control. We don't need to pass a closed
             // loop slot, as it will default to slot 0.
-            .p(0.013)
+            .p(0.01)
             .i(0.)
             .d(0)
-            .outputRange(-1, 1);
+            .outputRange(-1, 1)
             // Set PID values for velocity control in slot 1
-            // .p(0, ClosedLoopSlot.kSlot1)
-            // .i(0, ClosedLoopSlot.kSlot1)
-            // .d(0, ClosedLoopSlot.kSlot1)
+            .p(0.01, ClosedLoopSlot.kSlot1)
+            .i(0, ClosedLoopSlot.kSlot1)
+            .d(0, ClosedLoopSlot.kSlot1)
             // .velocityFF(1.0 / 5767, ClosedLoopSlot.kSlot1)
-            // .outputRange(-1, 1, ClosedLoopSlot.kSlot1);
+            .outputRange(-1, 1, ClosedLoopSlot.kSlot1);
 
         leaderConfig.closedLoop.maxMotion
             // Set MAXMotion parameters for position control. We don't need to pass
             // a closed loop slot, as it will default to slot 0.
-            .maxVelocity(10000)
-            .maxAcceleration(20000)
-            .allowedClosedLoopError(0.5);
+            .maxVelocity(4000)
+            .maxAcceleration(25000)
+            .allowedClosedLoopError(1)
             // Set MAXMotion parameters for velocity control in slot 1
-            // .maxAcceleration(500, ClosedLoopSlot.kSlot1)
-            // .maxVelocity(6000, ClosedLoopSlot.kSlot1)
-            // .allowedClosedLoopError(3, ClosedLoopSlot.kSlot1);
+            .maxAcceleration(15000, ClosedLoopSlot.kSlot1)
+            .maxVelocity(10000, ClosedLoopSlot.kSlot1)
+            .allowedClosedLoopError(1, ClosedLoopSlot.kSlot1);
 
 
         /*
@@ -108,7 +108,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     {
         return this.runOnce(
             () -> 
-            closedLoopController.setReference(40, ControlType.kMAXMotionPositionControl,//50
+            closedLoopController.setReference(53, ControlType.kMAXMotionPositionControl,//50
           ClosedLoopSlot.kSlot0));
     }
 
@@ -125,7 +125,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         return this.runOnce(
             () -> 
             closedLoopController.setReference(0, ControlType.kMAXMotionPositionControl,
-          ClosedLoopSlot.kSlot0));
+          ClosedLoopSlot.kSlot1));
     }
 
     public int getTargetPosition()

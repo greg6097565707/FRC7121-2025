@@ -7,13 +7,16 @@ package frc.robot.subsystems;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
@@ -21,6 +24,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.LimelightHelpers.LimelightTarget_Fiducial;
+import frc.robot.LimelightHelpers.LimelightTarget_Retro;
+import frc.robot.LimelightHelpers;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
@@ -32,7 +38,8 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
 import com.studica.frc.AHRS.BoardYawAxis;
-import com.studica.frc.AHRS.BoardAxis;;
+import com.studica.frc.AHRS.BoardAxis;
+
 // import com.kauailabs.navx.frc.AHRS;
 
 
@@ -120,30 +127,34 @@ public class DriveSubsystem extends SubsystemBase {
       // Handle exception as needed
       e.printStackTrace();
     }
+       
+    
+   
+  
 
     SmartDashboard.putData("Swerve",
         builder -> {
           builder.setSmartDashboardType("SwerveDrive");
 
           builder.addDoubleProperty(
-              "Front Left Angle", () -> m_frontLeft.getPosition().angle.getRadians(), null);
+              "Front Left Angle", () -> m_frontLeft.getPosition().angle.getDegrees(), null);
           builder.addDoubleProperty(
-              "Front Left Velocity", () -> m_frontLeft.getMState().speedMetersPerSecond, null);
+              "Front Left Velocity", () -> m_frontLeft.getState().speedMetersPerSecond, null);
 
           builder.addDoubleProperty(
-              "Front Right Angle", () -> m_frontRight.getPosition().angle.getRadians(), null);
+              "Front Right Angle", () -> m_frontRight.getPosition().angle.getDegrees(), null);
           builder.addDoubleProperty(
-              "Front Right Velocity", () ->m_frontRight.getMState().speedMetersPerSecond, null);
+              "Front Right Velocity", () ->m_frontRight.getState().speedMetersPerSecond, null);
 
           builder.addDoubleProperty(
-              "Back Left Angle", () -> m_rearLeft.getPosition().angle.getRadians(), null);
+              "Back Left Angle", () -> m_rearLeft.getPosition().angle.getDegrees(), null);
           builder.addDoubleProperty(
-              "Back Left Velocity", () -> m_rearLeft.getMState().speedMetersPerSecond, null);
+              "Back Left Velocity", () -> m_rearLeft.getState().speedMetersPerSecond, null);
 
           builder.addDoubleProperty(
-              "Back Right Angle", () -> m_rearRight.getPosition().angle.getRadians(), null);
+              "Back Right Angle", () -> m_rearRight.getPosition().angle.getDegrees(), null);
           builder.addDoubleProperty(
-              "Back Right Velocity", () -> m_rearRight.getMState().speedMetersPerSecond, null);
+              "Back Right Velocity", () -> m_rearRight.getState().speedMetersPerSecond, null);
 
           builder.addDoubleProperty(
               "Robot Angle", () -> getTrueHeading(), null);
@@ -164,6 +175,7 @@ public class DriveSubsystem extends SubsystemBase {
             m_rearRight.getPosition()
         });
 
+    SmartDashboard.putNumber("x speed", limelightYSpeed());
 
     
 
@@ -310,29 +322,55 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   
-  // AutoBuilder.configure(
-  //           this::getPose, // Robot pose supplier
-  //           this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
-  //           this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-  //           (speeds, feedforwards) -> driveRobotRelative(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
-  //           new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-  //                   new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-  //                   new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
-  //           ),
-  //           config, // The robot configuration
-  //           () -> {
-  //             // Boolean supplier that controls when the path will be mirrored for the red alliance
-  //             // This will flip the path being followed to the red side of the field.
-  //             // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+   // simple proportional turning control with Limelight.
+  // "proportional control" is a control algorithm in which the output is proportional to the error.
+  // in this case, we are going to return an angular velocity that is proportional to the 
+  // "tx" value from the Limelight.
+  public double limelight_aim_proportional()
+  {    
+    // // kP (constant of proportionality)
+    // // this is a hand-tuned number that determines the aggressiveness of our proportional control loop
+    // // if it is too high, the robot will oscillate around.
+    // // if it is too low, the robot will never reach its target
+    // // if the robot never turns in the correct direction, kP should be inverted.
+    // double kP = .0006;
 
-  //             var alliance = DriverStation.getAlliance();
-  //             if (alliance.isPresent()) {
-  //               return alliance.get() == DriverStation.Alliance.Red;
-  //             }
-  //             return false;
-  //           },
-  //           this // Reference to this subsystem to set requirements
-  //   );
-  // }
-// }
+    // // tx ranges from (-hfov/2) to (hfov/2) in degrees. If your target is on the rightmost edge of 
+    // // your limelight 3 feed, tx should return roughly 31 degrees.
+    // double targetingAngularVelocity = (LimelightHelpers.getTX("limelight")-0) * kP;
+
+    // // convert to radians per second for our drive method
+    // targetingAngularVelocity *= DriveConstants.kMaxAngularSpeed;
+
+    // //invert since tx is positive when the target is to the right of the crosshair
+    // targetingAngularVelocity *= -1.0;
+
+    // return targetingAngularVelocity;
+
+
+    // double id = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDoubleArray(new double[6]);
+
+    return (0 + getTrueHeading()) * -0.008;
+  }
+
+  public double limelightYSpeed()
+  {
+    double kP = .15;
+    Pose3d targetingYSpeed = LimelightHelpers.getBotPose3d_TargetSpace("limelight");
+    return (targetingYSpeed.getX()-.2) * kP;
+  }
+
+  // simple proportional ranging control with Limelight's "ty" value
+  // this works best if your Limelight's mount height and target mount height are different.
+  // if your limelight and target are mounted at the same or similar heights, use "ta" (area) for target ranging rather than "ty"
+  public double limelight_range_proportional()
+  {    
+    double kP = .001;
+    double targetingForwardSpeed = (LimelightHelpers.getTY("limelight")-1.5) * kP;
+    targetingForwardSpeed *= DriveConstants.kMaxSpeedMetersPerSecond;
+    targetingForwardSpeed *= -1.0;
+    return targetingForwardSpeed;
+  }
+
+  
 }

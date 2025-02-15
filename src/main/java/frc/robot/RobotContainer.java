@@ -88,13 +88,36 @@ public class RobotContainer {
     //         m_robotDrive));
 
     new JoystickButton(m_driverController, XboxController.Button.kA.value)
-      .onTrue(horizontalElevatorSubsystem.forward());
+      .onTrue(elevatorSubsystem.raiseElevatorTop());
 
     new JoystickButton(m_driverController, XboxController.Button.kX.value)
       .onTrue(elevatorSubsystem.raiseElevatorMid());
 
     new JoystickButton(m_driverController, XboxController.Button.kB.value)
-      .onTrue(horizontalElevatorSubsystem.back());
+      .onTrue(elevatorSubsystem.lowerElevator());
+
+
+    new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
+      .whileTrue(
+        new RunCommand(
+          () -> m_robotDrive.drive(
+            m_robotDrive.limelight_range_proportional(),
+            m_robotDrive.limelightYSpeed(),
+            m_robotDrive.limelight_aim_proportional(),
+            false),
+            m_robotDrive)
+      );
+
+    // new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
+    //   .whileTrue(
+    //     new RunCommand(
+    //       () -> m_robotDrive.drive(
+    //         m_robotDrive.limelight_range_proportional(),
+    //         m_robotDrive.limelightYSpeed(),
+    //         0,
+    //         false),
+    //         m_robotDrive)
+    //   );
 
   }
 
