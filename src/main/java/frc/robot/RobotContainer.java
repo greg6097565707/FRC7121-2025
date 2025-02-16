@@ -40,14 +40,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
  */
 public class RobotContainer {
 
-  public static BooleanSupplier isNotAligned() {
-    Pose3d targetingYSpeed = LimelightHelpers.getBotPose3d_TargetSpace("limelight");
-    return (BooleanSupplier) () -> {
-        if (Math.abs(targetingYSpeed.getX()+DriveSubsystem.autoAlignYoffsetRight) > 0.001 && (LimelightHelpers.getTY("limelight")+DriveSubsystem.autoAlignXoffset) > 0.01) {
-            return true;
-        } else return false;
-    };
-}
+  
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
@@ -59,6 +52,15 @@ public class RobotContainer {
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
 
+  // robot state boolean suppliers
+  public static BooleanSupplier isNotAligned() {
+    Pose3d targetingYSpeed = LimelightHelpers.getBotPose3d_TargetSpace("limelight");
+    return (BooleanSupplier) () -> {
+        if (Math.abs(targetingYSpeed.getX()+DriveSubsystem.autoAlignYoffsetRight) > 0.001 && (LimelightHelpers.getTY("limelight")+DriveSubsystem.autoAlignXoffset) > 0.01) {
+            return true;
+        } else return false;
+    };
+}
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
@@ -100,7 +102,7 @@ public class RobotContainer {
     //         m_robotDrive));
 
     new JoystickButton(m_driverController, XboxController.Button.kA.value)
-      .onTrue(elevatorSubsystem.raiseElevatorTop());
+      .onTrue(elevatorSubsystem.raiseElevatorTop().alongWith(horizontalElevatorSubsystem.forward()));
 
     new JoystickButton(m_driverController, XboxController.Button.kX.value)
       .onTrue(elevatorSubsystem.raiseElevatorMid());
