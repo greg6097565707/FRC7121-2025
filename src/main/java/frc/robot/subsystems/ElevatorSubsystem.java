@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.RobotContainer;
 
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -102,6 +103,9 @@ public class ElevatorSubsystem extends SubsystemBase {
         */
         leader.configure(leaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         follower.configure(followerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    }
+    public Command RasiseWhileAligning(){
+        return run(null).onlyWhile(RobotContainer.isNotAligned()).finallyDo(this::raiseElevatorTop);
     }
 
     public Command raiseElevatorTop()
