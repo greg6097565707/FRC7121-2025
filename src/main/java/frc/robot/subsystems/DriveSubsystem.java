@@ -27,6 +27,8 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.LimelightHelpers.LimelightTarget_Fiducial;
 import frc.robot.LimelightHelpers.LimelightTarget_Retro;
 import frc.robot.LimelightHelpers;
+import frc.robot.RobotContainer;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
@@ -46,6 +48,17 @@ import com.studica.frc.AHRS.BoardAxis;
 
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
+public Command AutoAlign() {
+  return run(this::autoAlignDrive).onlyWhile(RobotContainer.isNotAligned());
+}
+public void autoAlignDrive() {
+  this.drive(limelightXSpeed(), 
+  limelightYSpeed(), 
+  limelightRotateToTarget(), 
+  false);
+}
+
+
   public final TalonFX talonFrontLeft = new TalonFX(DriveConstants.kFrontLeftDrivingCanId);
   private final MAXSwerveModule m_frontLeft = new MAXSwerveModule(
     talonFrontLeft,
@@ -326,7 +339,7 @@ public class DriveSubsystem extends SubsystemBase {
   // "proportional control" is a control algorithm in which the output is proportional to the error.
   // in this case, we are going to return an angular velocity that is proportional to the 
   // "tx" value from the Limelight.
-  public double limelight_aim_proportional()
+  public double limelightRotateToTarget()
   {    
     // // kP (constant of proportionality)
     // // this is a hand-tuned number that determines the aggressiveness of our proportional control loop
@@ -352,21 +365,21 @@ public class DriveSubsystem extends SubsystemBase {
 
     return (0 + getTrueHeading()) * -0.008;
   }
-
+public static final double autoAlignYoffsetRight = -.2;
   public double limelightYSpeed()
   {
     double kP = .15;
     Pose3d targetingYSpeed = LimelightHelpers.getBotPose3d_TargetSpace("limelight");
-    return (targetingYSpeed.getX()-.2) * kP;
+    return (targetingYSpeed.getX()+autoAlignYoffsetRight) * kP;
   }
 
   // simple proportional ranging control with Limelight's "ty" value
   // this works best if your Limelight's mount height and target mount height are different.
-  // if your limelight and target are mounted at the same or similar heights, use "ta" (area) for target ranging rather than "ty"
-  public double limelight_range_proportional()
+  public static final double autoAlignXoffset = -1.5;// if your limelight and target are mounted at the same or similar heights, use "ta" (area) for target ranging rather than "ty"
+  public double limelightXSpeed()
   {    
     double kP = .001;
-    double targetingForwardSpeed = (LimelightHelpers.getTY("limelight")-1.5) * kP;
+    double targetingForwardSpeed = (LimelightHelpers.getTY("limelight")+autoAlignXoffset) * kP;
     targetingForwardSpeed *= DriveConstants.kMaxSpeedMetersPerSecond;
     targetingForwardSpeed *= -1.0;
     return targetingForwardSpeed;

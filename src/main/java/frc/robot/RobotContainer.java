@@ -8,6 +8,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
@@ -27,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 
@@ -37,6 +39,15 @@ import com.pathplanner.lib.auto.AutoBuilder;
  * (including subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+
+  public static BooleanSupplier isNotAligned() {
+    Pose3d targetingYSpeed = LimelightHelpers.getBotPose3d_TargetSpace("limelight");
+    return (BooleanSupplier) () -> {
+        if (Math.abs(targetingYSpeed.getX()+DriveSubsystem.autoAlignYoffsetRight) > 0.001 && (LimelightHelpers.getTY("limelight")+DriveSubsystem.autoAlignXoffset) > 0.01) {
+            return true;
+        } else return false;
+    };
+}
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
@@ -52,9 +63,10 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+    
     // Configure the button bindings
     configureButtonBindings();
-
+    
     autoChooser = AutoBuilder.buildAutoChooser("Example Auto");
 
 
@@ -98,26 +110,17 @@ public class RobotContainer {
 
 
     new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
-      .whileTrue(
-        new RunCommand(
-          () -> m_robotDrive.drive(
-            m_robotDrive.limelight_range_proportional(),
-            m_robotDrive.limelightYSpeed(),
-            m_robotDrive.limelight_aim_proportional(),
-            false),
-            m_robotDrive)
+      .onTrue(m_robotDrive.AutoAlign()
+        // new RunCommand(
+        //   () -> m_robotDrive.drive(
+        //     m_robotDrive.limelightXSpeed(),
+        //     m_robotDrive.limelightYSpeed(),
+        //     m_robotDrive.limelightRotateToTarget(),
+        //     false),
+        //     m_robotDrive)
       );
 
-    // new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
-    //   .whileTrue(
-    //     new RunCommand(
-    //       () -> m_robotDrive.drive(
-    //         m_robotDrive.limelight_range_proportional(),
-    //         m_robotDrive.limelightYSpeed(),
-    //         0,
-    //         false),
-    //         m_robotDrive)
-    //   );
+    
 
   }
 
