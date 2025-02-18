@@ -144,6 +144,7 @@ public void autoAlignDrive() {
     
    
   
+    SmartDashboard.putBoolean("isNotAligned", RobotContainer.isNotAligned().getAsBoolean());
 
     SmartDashboard.putData("Swerve",
         builder -> {
@@ -189,6 +190,7 @@ public void autoAlignDrive() {
         });
 
     SmartDashboard.putNumber("x speed", limelightYSpeed());
+
 
     
 
@@ -360,19 +362,45 @@ public void autoAlignDrive() {
 
     // return targetingAngularVelocity;
 
-
+  double TAGID = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0); 
+  SmartDashboard.putNumber("TagId", TAGID);
     // double id = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDoubleArray(new double[6]);
 
     double rotationValue = 0;
+    // way to ratote to desired angle using tag id
+    if (TAGID == 7 || TAGID == 18)
+    {
+      rotationValue = 0;
+    }
+    else if (TAGID == 8 || TAGID == 17)
+    {
+      rotationValue = 60;
+    }
+    else if (TAGID == 9 || TAGID == 22)
+    {
+      rotationValue = 120;
+    }
+    else if (TAGID == 10 || TAGID == 21)
+    {
+      rotationValue = 180;
+    }
+    else if (TAGID == 11 || TAGID == 20)
+    {
+      rotationValue = 240;
+    }
+    else if (TAGID == 6 || TAGID == 19)
+    {
+      rotationValue = 300;
+    }
 
-    if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red)
-    {
-      rotationValue = (21 - NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0)) * 60;
-    }
-    else if (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue)
-    {
-      rotationValue = (10 - NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0)) * 60;
-    }
+    // if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red)
+    // {
+    //   rotationValue = (21 - NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0)) * 60;
+    // }
+    // else if (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue)
+    // {
+    //   rotationValue = (10 - NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0)) * 60;
+    // }
 
     return (rotationValue + getTrueHeading()) * -0.008;
   }
