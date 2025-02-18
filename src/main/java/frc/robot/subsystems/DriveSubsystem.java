@@ -363,7 +363,18 @@ public void autoAlignDrive() {
 
     // double id = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDoubleArray(new double[6]);
 
-    return (0 + getTrueHeading()) * -0.008;
+    double rotationValue = 0;
+
+    if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red)
+    {
+      rotationValue = (21 - NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0)) * 60;
+    }
+    else if (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue)
+    {
+      rotationValue = (10 - NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0)) * 60;
+    }
+
+    return (rotationValue + getTrueHeading()) * -0.008;
   }
 public static final double autoAlignYoffsetRight = -.2;
   public double limelightYSpeed()
