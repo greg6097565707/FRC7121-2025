@@ -48,13 +48,22 @@ import com.studica.frc.AHRS.BoardAxis;
 
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
-  private double TAGID = 0;
-public Command AutoAlign() {
-  return run(this::autoAlignDrive).onlyWhile(RobotContainer.isNotAligned()).withTimeout(2.5);
+
+public Command AutoAlignRight() {
+  return run(this::autoAlignDriveRight).onlyWhile(RobotContainer.isNotAlignedRight()).withTimeout(2.5);
 }
-public void autoAlignDrive() {
+public Command AutoAlignLeft() {
+  return run(this::autoAlignDriveLeft).onlyWhile(RobotContainer.isNotAlignedLeft()).withTimeout(2.5);
+}
+public void autoAlignDriveRight() {
   this.drive(limelightXSpeed(), 
-  limelightYSpeed(), 
+  limelightYSpeedAlignRight(), 
+  limelightRotateToTarget(), 
+  false);
+}
+public void autoAlignDriveLeft() {
+  this.drive(limelightXSpeed(), 
+  limelightYSpeedAlignLeft(), 
   limelightRotateToTarget(), 
   false);
 }
@@ -177,11 +186,40 @@ public void autoAlignDrive() {
 
 
   }
-  private 
+  private double rotationValue;
+  private void updateRotationValue(){
+   double TAGID = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0); 
+   if (TAGID == 7 || TAGID == 18)
+    {
+      rotationValue = 0;
+    }
+    else if (TAGID == 8 || TAGID == 17)
+    {
+      rotationValue = 60;
+    }
+    else if (TAGID == 9 || TAGID == 22)
+    {
+      rotationValue = 120;
+    }
+    else if (TAGID == 10 || TAGID == 21)
+    {
+      rotationValue = 180;
+    }
+    else if (TAGID == 11 || TAGID == 20)
+    {
+      rotationValue = -120;
+    }
+    else if (TAGID == 6 || TAGID == 19)
+    {
+      rotationValue = 300;
+    }
+    
+  }
 
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
+    updateRotationValue();
     m_odometry.update(
         Rotation2d.fromDegrees(this.getTrueHeading()),
         new SwerveModulePosition[] {
@@ -191,11 +229,12 @@ public void autoAlignDrive() {
             m_rearRight.getPosition()
         });
 
-    SmartDashboard.putNumber("x speed", limelightYSpeed());
-    SmartDashboard.putBoolean("isNotAligned", RobotContainer.isNotAligned().getAsBoolean());
+    // SmartDashboard.putNumber("x speed", limelightYSpeedAlignRight());
+    SmartDashboard.putBoolean("isNotAligned", RobotContainer.isNotAlignedRight().getAsBoolean());
     SmartDashboard.putNumber("TagId", NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0));
     SmartDashboard.putString("pose", getPose().toString());
     SmartDashboard.putNumber("True Heading", this.getTrueHeading());
+    SmartDashboard.getNumber("Rotation Value", (rotationValue));
     // in DriveSubsystem.java
     
 
@@ -369,35 +408,35 @@ public void autoAlignDrive() {
     // return targetingAngularVelocity;
 
     // double TAGID = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0); 
-    SmartDashboard.putNumber("TagId", TAGID);
+    // SmartDashboard.putNumber("TagId", TAGID);
       // double id = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDoubleArray(new double[6]);
 
-    double rotationValue = 90;
-      // way to ratote to desired angle using tag id
-    if (TAGID == 7 || TAGID == 18)
-    {
-      rotationValue = 0;
-    }
-    else if (TAGID == 8 || TAGID == 17)
-    {
-      rotationValue = 60;
-    }
-    else if (TAGID == 9 || TAGID == 22)
-    {
-      rotationValue = 120;
-    }
-    else if (TAGID == 10 || TAGID == 21)
-    {
-      rotationValue = 180;
-    }
-    else if (TAGID == 11 || TAGID == 20)
-    {
-      rotationValue = -120;
-    }
-    else if (TAGID == 6 || TAGID == 19)
-    {
-      rotationValue = 300;
-    }
+    // double rotationValue = 90;
+    //   // way to ratote to desired angle using tag id
+    // if (TAGID == 7 || TAGID == 18)
+    // {
+    //   rotationValue = 0;
+    // }
+    // else if (TAGID == 8 || TAGID == 17)
+    // {
+    //   rotationValue = 60;
+    // }
+    // else if (TAGID == 9 || TAGID == 22)
+    // {
+    //   rotationValue = 120;
+    // }
+    // else if (TAGID == 10 || TAGID == 21)
+    // {
+    //   rotationValue = 180;
+    // }
+    // else if (TAGID == 11 || TAGID == 20)
+    // {
+    //   rotationValue = -120;
+    // }
+    // else if (TAGID == 6 || TAGID == 19)
+    // {
+    //   rotationValue = 300;
+    // }
 
       // if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red)
       // {
@@ -410,13 +449,25 @@ public void autoAlignDrive() {
 
     return (rotationValue + getTrueHeading()) * -0.008;
   }
-public static final double autoAlignYoffsetRight = -.2;
-  public double limelightYSpeed()
+  // alignment Y speed Right
+  public static final double autoAlignYoffsetRight = -.2;
+  public double limelightYSpeedAlignRight()
   {
     double kP = .25;
     Pose3d targetingYSpeed = LimelightHelpers.getBotPose3d_TargetSpace("limelight");
     return (targetingYSpeed.getX()+autoAlignYoffsetRight) * kP;
   }
+
+  // alignment spped Y left
+  public static final double autoAlignYoffsetLeft = .2;
+  public double limelightYSpeedAlignLeft()
+  {
+    double kP = .25;
+    Pose3d targetingYSpeed = LimelightHelpers.getBotPose3d_TargetSpace("limelight");
+    return (targetingYSpeed.getX()+autoAlignYoffsetLeft) * kP;
+  }
+
+
 
   // simple proportional ranging control with Limelight's "ty" value
   // this works best if your Limelight's mount height and target mount height are different.

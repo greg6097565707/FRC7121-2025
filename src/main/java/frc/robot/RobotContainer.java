@@ -54,7 +54,7 @@ public class RobotContainer {
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
 
   // robot state boolean suppliers
-  public static BooleanSupplier isNotAligned() {
+  public static BooleanSupplier isNotAlignedRight() {
     Pose3d targetingYSpeed = LimelightHelpers.getBotPose3d_TargetSpace("limelight");
     return (BooleanSupplier) () -> {
         if (Math.abs(targetingYSpeed.getX()+DriveSubsystem.autoAlignYoffsetRight) > 0.04
@@ -62,6 +62,15 @@ public class RobotContainer {
             return true;
         } else return false;
     };
+}
+public static BooleanSupplier isNotAlignedLeft() {
+  Pose3d targetingYSpeed = LimelightHelpers.getBotPose3d_TargetSpace("limelight");
+  return (BooleanSupplier) () -> {
+      if (Math.abs(targetingYSpeed.getX()+DriveSubsystem.autoAlignYoffsetLeft) > 0.04
+      &&  (Math.abs(LimelightHelpers.getTY("limelight")+DriveSubsystem.autoAlignXoffset)) > 0.3 ) {
+          return true;
+      } else return false;
+  };
 }
 // LimelightHelpers.getTY("limelight")+DriveSubsystem.autoAlignXoffset) < 0.01
 // Math.abs(targetingYSpeed.getX()+DriveSubsystem.autoAlignYoffsetRight) > 0.04
@@ -117,7 +126,7 @@ public class RobotContainer {
 
     new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
     // .whileTrue(
-      .onTrue(m_robotDrive.AutoAlign()
+      .onTrue(m_robotDrive.AutoAlignRight()
         // new RunCommand(
         //   () -> m_robotDrive.drive(
         //     m_robotDrive.limelightXSpeed(),
@@ -126,6 +135,8 @@ public class RobotContainer {
         //     false),
         //     m_robotDrive)
       );
+    new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value)
+      .onTrue(m_robotDrive.AutoAlignLeft());
 
     
 
