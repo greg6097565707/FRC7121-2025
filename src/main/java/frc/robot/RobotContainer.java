@@ -57,11 +57,14 @@ public class RobotContainer {
   public static BooleanSupplier isNotAligned() {
     Pose3d targetingYSpeed = LimelightHelpers.getBotPose3d_TargetSpace("limelight");
     return (BooleanSupplier) () -> {
-        if (Math.abs(targetingYSpeed.getX()+DriveSubsystem.autoAlignYoffsetRight) > 0.001 && (LimelightHelpers.getTY("limelight")+DriveSubsystem.autoAlignXoffset) > 0.01) {
+        if (Math.abs(targetingYSpeed.getX()+DriveSubsystem.autoAlignYoffsetRight) > 0.04
+        &&  (Math.abs(LimelightHelpers.getTY("limelight")+DriveSubsystem.autoAlignXoffset)) > 0.3 ) {
             return true;
         } else return false;
     };
 }
+// LimelightHelpers.getTY("limelight")+DriveSubsystem.autoAlignXoffset) < 0.01
+// Math.abs(targetingYSpeed.getX()+DriveSubsystem.autoAlignYoffsetRight) > 0.04
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
@@ -70,7 +73,7 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
     
-    autoChooser = AutoBuilder.buildAutoChooser("Example Auto");
+    autoChooser = AutoBuilder.buildAutoChooser("Test Auto");
     
 
 
@@ -80,9 +83,9 @@ public class RobotContainer {
         // Turning is controlled by the X axis of the right stick.
         new RunCommand(
             () -> m_robotDrive.drive(
-                -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
+                -MathUtil.applyDeadband(m_driverController.getLeftY() * OIConstants.driveSensitivity, OIConstants.kDriveDeadband),
+                -MathUtil.applyDeadband(m_driverController.getLeftX() * OIConstants.driveSensitivity, OIConstants.kDriveDeadband),
+                -MathUtil.applyDeadband(m_driverController.getRightX() * OIConstants.driveSensitivity, OIConstants.kDriveDeadband),
                 true),
             m_robotDrive));
   }
@@ -113,6 +116,7 @@ public class RobotContainer {
 
 
     new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
+    // .whileTrue(
       .onTrue(m_robotDrive.AutoAlign()
         // new RunCommand(
         //   () -> m_robotDrive.drive(

@@ -48,8 +48,9 @@ import com.studica.frc.AHRS.BoardAxis;
 
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
+  private double TAGID = 0;
 public Command AutoAlign() {
-  return run(this::autoAlignDrive).onlyWhile(RobotContainer.isNotAligned());
+  return run(this::autoAlignDrive).onlyWhile(RobotContainer.isNotAligned()).withTimeout(2.5);
 }
 public void autoAlignDrive() {
   this.drive(limelightXSpeed(), 
@@ -119,8 +120,8 @@ public void autoAlignDrive() {
               (speeds, feedforwards) -> driveRobotRelative(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
               // this::driveRobotRelative(getSpeeds()),
               new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-                      new PIDConstants(2.0, 0.0, 0.0), // Translation PID constants
-                      new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+                      new PIDConstants(7.0, 0.0, 0.0), // Translation PID constants
+                      new PIDConstants(8.0, 0.0, 0.0) // Rotation PID constants
               ),
               config, // The robot configuration
               () -> {
@@ -144,7 +145,7 @@ public void autoAlignDrive() {
     
    
   
-    SmartDashboard.putBoolean("isNotAligned", RobotContainer.isNotAligned().getAsBoolean());
+    
 
     SmartDashboard.putData("Swerve",
         builder -> {
@@ -176,6 +177,7 @@ public void autoAlignDrive() {
 
 
   }
+  private 
 
   @Override
   public void periodic() {
@@ -190,10 +192,10 @@ public void autoAlignDrive() {
         });
 
     SmartDashboard.putNumber("x speed", limelightYSpeed());
-
-
-    
-
+    SmartDashboard.putBoolean("isNotAligned", RobotContainer.isNotAligned().getAsBoolean());
+    SmartDashboard.putNumber("TagId", NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0));
+    SmartDashboard.putString("pose", getPose().toString());
+    SmartDashboard.putNumber("True Heading", this.getTrueHeading());
     // in DriveSubsystem.java
     
 
@@ -340,7 +342,11 @@ public void autoAlignDrive() {
    // simple proportional turning control with Limelight.
   // "proportional control" is a control algorithm in which the output is proportional to the error.
   // in this case, we are going to return an angular velocity that is proportional to the 
+  
+  
   // "tx" value from the Limelight.
+
+
   public double limelightRotateToTarget()
   {    
     // // kP (constant of proportionality)
@@ -362,12 +368,12 @@ public void autoAlignDrive() {
 
     // return targetingAngularVelocity;
 
-  double TAGID = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0); 
-  SmartDashboard.putNumber("TagId", TAGID);
-    // double id = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDoubleArray(new double[6]);
+    // double TAGID = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0); 
+    SmartDashboard.putNumber("TagId", TAGID);
+      // double id = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDoubleArray(new double[6]);
 
-    double rotationValue = 0;
-    // way to ratote to desired angle using tag id
+    double rotationValue = 90;
+      // way to ratote to desired angle using tag id
     if (TAGID == 7 || TAGID == 18)
     {
       rotationValue = 0;
@@ -386,35 +392,35 @@ public void autoAlignDrive() {
     }
     else if (TAGID == 11 || TAGID == 20)
     {
-      rotationValue = 240;
+      rotationValue = -120;
     }
     else if (TAGID == 6 || TAGID == 19)
     {
       rotationValue = 300;
     }
 
-    // if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red)
-    // {
-    //   rotationValue = (21 - NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0)) * 60;
-    // }
-    // else if (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue)
-    // {
-    //   rotationValue = (10 - NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0)) * 60;
-    // }
+      // if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red)
+      // {
+      //   rotationValue = (21 - NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0)) * 60;
+      // }
+      // else if (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue)
+      // {
+      //   rotationValue = (10 - NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0)) * 60;
+      // }
 
     return (rotationValue + getTrueHeading()) * -0.008;
   }
 public static final double autoAlignYoffsetRight = -.2;
   public double limelightYSpeed()
   {
-    double kP = .15;
+    double kP = .25;
     Pose3d targetingYSpeed = LimelightHelpers.getBotPose3d_TargetSpace("limelight");
     return (targetingYSpeed.getX()+autoAlignYoffsetRight) * kP;
   }
 
   // simple proportional ranging control with Limelight's "ty" value
   // this works best if your Limelight's mount height and target mount height are different.
-  public static final double autoAlignXoffset = -1.5;// if your limelight and target are mounted at the same or similar heights, use "ta" (area) for target ranging rather than "ty"
+  public static final double autoAlignXoffset = -7.5;// if your limelight and target are mounted at the same or similar heights, use "ta" (area) for target ranging rather than "ty"
   public double limelightXSpeed()
   {    
     double kP = .001;
