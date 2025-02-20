@@ -36,6 +36,8 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.util.GeometryUtil;
 
+import java.util.function.BooleanSupplier;
+
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
@@ -48,9 +50,16 @@ import com.studica.frc.AHRS.BoardAxis;
 
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
+private BooleanSupplier hasTagAndIsNotAligned() {
+  if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0)!=-1 && RobotContainer.isNotAlignedRight().getAsBoolean()) {
+    return (BooleanSupplier) () -> true;
+  } else {
+    return (BooleanSupplier) () -> false;
+  }
+}
 
 public Command AutoAlignRight() {
-  return run(this::autoAlignDriveRight).onlyWhile(RobotContainer.isNotAlignedRight()).withTimeout(2.5);
+  return run(this::autoAlignDriveRight).onlyWhile(hasTagAndIsNotAligned()).withTimeout(2.5);
 }
 public Command AutoAlignLeft() {
   return run(this::autoAlignDriveLeft).onlyWhile(RobotContainer.isNotAlignedLeft()).withTimeout(2.5);
@@ -211,10 +220,11 @@ public void autoAlignDriveLeft() {
     }
     else if (TAGID == 6 || TAGID == 19)
     {
-      rotationValue = 300;
+      rotationValue = -60;
     }
     
   }
+  
 
   @Override
   public void periodic() {
@@ -234,7 +244,7 @@ public void autoAlignDriveLeft() {
     SmartDashboard.putNumber("TagId", NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0));
     SmartDashboard.putString("pose", getPose().toString());
     SmartDashboard.putNumber("True Heading", this.getTrueHeading());
-    SmartDashboard.getNumber("Rotation Value", (rotationValue));
+    SmartDashboard.putNumber("Rotation Value", (rotationValue));
     // in DriveSubsystem.java
     
 
@@ -447,7 +457,7 @@ public void autoAlignDriveLeft() {
       //   rotationValue = (10 - NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0)) * 60;
       // }
 
-    return (rotationValue + getTrueHeading()) * -0.008;
+    return ((getTrueHeading() + rotationValue)%180) * -0.008;
   }
   // alignment Y speed Right
   public static final double autoAlignYoffsetRight = -.2;
@@ -471,7 +481,7 @@ public void autoAlignDriveLeft() {
 
   // simple proportional ranging control with Limelight's "ty" value
   // this works best if your Limelight's mount height and target mount height are different.
-  public static final double autoAlignXoffset = -7.5;// if your limelight and target are mounted at the same or similar heights, use "ta" (area) for target ranging rather than "ty"
+  public static final double autoAlignXoffset = -4;// if your limelight and target are mounted at the same or similar heights, use "ta" (area) for target ranging rather than "ty"
   public double limelightXSpeed()
   {    
     double kP = .001;

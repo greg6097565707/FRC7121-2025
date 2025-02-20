@@ -104,9 +104,9 @@ public class ElevatorSubsystem extends SubsystemBase {
         leader.configure(leaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         follower.configure(followerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
-    public Command RasiseWhileAligning(){
-        return run(null).onlyWhile(RobotContainer.isNotAligned()).finallyDo(this::raiseElevatorTop);
-    }
+    // public Command RasiseWhileAligning(){
+    //     return run(null).onlyWhile(RobotContainer.isNotAligned()).finallyDo(this::raiseElevatorTop);
+    // }
 
     public Command raiseElevatorTop()
     {
