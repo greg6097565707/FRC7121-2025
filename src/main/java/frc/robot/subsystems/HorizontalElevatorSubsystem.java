@@ -99,7 +99,7 @@ public class HorizontalElevatorSubsystem extends SubsystemBase {
     {
         return this.runOnce(
             () -> 
-            closedLoopController.setReference(48, ControlType.kMAXMotionPositionControl,
+            closedLoopController.setReference(43, ControlType.kMAXMotionPositionControl,
           ClosedLoopSlot.kSlot0));
     }
 

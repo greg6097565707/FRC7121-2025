@@ -9,6 +9,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import frc.robot.IntakeIR;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
@@ -24,6 +25,7 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.HorizontalElevatorSubsystem;
+import frc.robot.subsystems.NewIntakeSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
@@ -43,9 +45,11 @@ public class RobotContainer {
 
   
   // The robot's subsystems
-  private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  public static final IntakeIR D_INTAKE_IR = new IntakeIR(0);
+  private final DriveSubsystem m_robotDrive = new DriveSubsystem(D_INTAKE_IR);
   private final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
   private final HorizontalElevatorSubsystem horizontalElevatorSubsystem = new HorizontalElevatorSubsystem();
+  private final NewIntakeSubsystem newIntakeSubsystem = new NewIntakeSubsystem();
 
   private final SendableChooser<Command> autoChooser;
 
@@ -115,13 +119,14 @@ public static BooleanSupplier isNotAlignedLeft() {
     //         m_robotDrive));
 
     new JoystickButton(m_driverController, XboxController.Button.kA.value)
-      .onTrue(elevatorSubsystem.raiseElevatorTop().alongWith(horizontalElevatorSubsystem.forward()));
+      .onTrue(m_robotDrive.AutoAlignRight().andThen(elevatorSubsystem.raiseElevatorTop().alongWith(horizontalElevatorSubsystem.forward())));
+      
 
-    new JoystickButton(m_driverController, XboxController.Button.kX.value)
-      .onTrue(elevatorSubsystem.raiseElevatorMid());
+    // new JoystickButton(m_driverController, XboxController.Button.kX.value)
+    //   .onTrue(elevatorSubsystem.raiseElevatorMid());
 
     new JoystickButton(m_driverController, XboxController.Button.kB.value)
-      .onTrue(elevatorSubsystem.lowerElevator());
+      .onTrue(elevatorSubsystem.lowerElevator().alongWith(horizontalElevatorSubsystem.back()).alongWith(newIntakeSubsystem.stopManual()));
 
 
     new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
@@ -137,7 +142,19 @@ public static BooleanSupplier isNotAlignedLeft() {
       );
     new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value)
       .onTrue(m_robotDrive.AutoAlignLeft());
-
+ 
+    new JoystickButton(m_driverController, XboxController.Button.kX.value)
+      .onTrue(newIntakeSubsystem.IntakeCoralSubstation().alongWith(elevatorSubsystem.raiseElevatorIntake())
+      .andThen(elevatorSubsystem.lowerElevator()));
+      new JoystickButton(m_driverController, XboxController.Button.kY.value)
+      .whileTrue(newIntakeSubsystem.IntakeManual());
+    // new JoystickButton(m_driverController, XboxController.Button.kY.value)
+    //   .whileTrue(newIntakeSubsystem.outTake());
+    
+    
+    
+    // new JoystickButton(m_driverController, XboxController.Button.kY.value)
+    //   .onTrue(newIntakeSubsystem.outTake());
     
 
   }

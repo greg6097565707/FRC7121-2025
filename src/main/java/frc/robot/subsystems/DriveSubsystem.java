@@ -26,6 +26,7 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.LimelightHelpers.LimelightTarget_Fiducial;
 import frc.robot.LimelightHelpers.LimelightTarget_Retro;
+import frc.robot.IntakeIR;
 import frc.robot.LimelightHelpers;
 import frc.robot.RobotContainer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -57,7 +58,7 @@ private BooleanSupplier hasTagAndIsNotAligned() {
     return (BooleanSupplier) () -> false;
   }
 }
-
+private IntakeIR iir;
 public Command AutoAlignRight() {
   return run(this::autoAlignDriveRight).onlyWhile(hasTagAndIsNotAligned()).withTimeout(2.5);
 }
@@ -121,7 +122,7 @@ public void autoAlignDriveLeft() {
       });
 
   /** Creates a new DriveSubsystem. */
-  public DriveSubsystem() {
+  public DriveSubsystem(IntakeIR iir) {
     // Usage reporting for MAXSwerve template
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
 
@@ -162,8 +163,7 @@ public void autoAlignDriveLeft() {
        
     
    
-  
-    
+    this.iir = iir;
 
     SmartDashboard.putData("Swerve",
         builder -> {
@@ -222,7 +222,6 @@ public void autoAlignDriveLeft() {
     {
       rotationValue = -60;
     }
-    
   }
   
 
@@ -245,6 +244,7 @@ public void autoAlignDriveLeft() {
     SmartDashboard.putString("pose", getPose().toString());
     SmartDashboard.putNumber("True Heading", this.getTrueHeading());
     SmartDashboard.putNumber("Rotation Value", (rotationValue));
+    SmartDashboard.putBoolean("intakeIR", this.iir.supplier.getAsBoolean());
     // in DriveSubsystem.java
     
 
@@ -457,10 +457,10 @@ public void autoAlignDriveLeft() {
       //   rotationValue = (10 - NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0)) * 60;
       // }
 
-    return ((getTrueHeading() + rotationValue)%180) * -0.008;
+    return ((getTrueHeading() - rotationValue)) * -0.008;
   }
   // alignment Y speed Right
-  public static final double autoAlignYoffsetRight = -.2;
+  public static final double autoAlignYoffsetRight = -.15;
   public double limelightYSpeedAlignRight()
   {
     double kP = .25;
@@ -481,7 +481,7 @@ public void autoAlignDriveLeft() {
 
   // simple proportional ranging control with Limelight's "ty" value
   // this works best if your Limelight's mount height and target mount height are different.
-  public static final double autoAlignXoffset = -4;// if your limelight and target are mounted at the same or similar heights, use "ta" (area) for target ranging rather than "ty"
+  public static final double autoAlignXoffset = -5;// if your limelight and target are mounted at the same or similar heights, use "ta" (area) for target ranging rather than "ty"
   public double limelightXSpeed()
   {    
     double kP = .001;

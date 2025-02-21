@@ -28,6 +28,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     private int targetPosition;
 
     public ElevatorSubsystem() {
+        
         leader = new SparkMax(Constants.ElevatorConstants.leaderID , MotorType.kBrushless);
         follower = new SparkMax(Constants.ElevatorConstants.followerID, MotorType.kBrushless);
 
@@ -108,11 +109,26 @@ public class ElevatorSubsystem extends SubsystemBase {
     //     return run(null).onlyWhile(RobotContainer.isNotAligned()).finallyDo(this::raiseElevatorTop);
     // }
 
+    public Command raiseElevatorIntake()
+    {
+        return this.runOnce(
+            () -> 
+            closedLoopController.setReference(10, ControlType.kMAXMotionPositionControl,//50
+          ClosedLoopSlot.kSlot0));
+    }
     public Command raiseElevatorTop()
     {
         return this.runOnce(
             () -> 
-            closedLoopController.setReference(53, ControlType.kMAXMotionPositionControl,//50
+            closedLoopController.setReference(50, ControlType.kMAXMotionPositionControl,//50
+          ClosedLoopSlot.kSlot0));
+    }
+
+    public Command raiseElevatorLow()
+    {
+        return this.runOnce(
+            () -> 
+            closedLoopController.setReference(15, ControlType.kMAXMotionPositionControl,
           ClosedLoopSlot.kSlot0));
     }
 
@@ -120,7 +136,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     {
         return this.runOnce(
             () -> 
-            closedLoopController.setReference(15, ControlType.kMAXMotionPositionControl,
+            closedLoopController.setReference(30, ControlType.kMAXMotionPositionControl,
           ClosedLoopSlot.kSlot0));
     }
 
