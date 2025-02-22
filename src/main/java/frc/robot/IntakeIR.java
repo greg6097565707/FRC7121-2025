@@ -13,9 +13,12 @@ public class IntakeIR extends DigitalInput {
             return false;
         };
     }
-    public boolean isNoteInIntake() {
+    public boolean isCoralInIntake() {
         return !this.get();
     }
+    
+
+    
     
 }
 

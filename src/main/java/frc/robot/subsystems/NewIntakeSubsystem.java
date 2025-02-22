@@ -59,6 +59,9 @@ public class NewIntakeSubsystem extends SubsystemBase {
     public Command IntakeCoralSubstation(){
         return startEnd(this::intake, this::stop).until(RobotContainer.D_INTAKE_IR.supplier);
     }
+    public Command ScoreIntakeCoral(){
+        return startEnd(this::intake, this::stop).until(RobotContainer.D_INTAKE_IR.supplier);//need to figure out how invert the supplier
+    }
     public void intake()
     {
         leader.set(0.5);

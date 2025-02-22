@@ -5,6 +5,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.RobotContainer;
+import frc.robot.subsystems.ElevatorSubsystem;
 
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -94,21 +96,36 @@ public class HorizontalElevatorSubsystem extends SubsystemBase {
         */
         leader.configure(leaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
+    public Command HElevatorForwardWithL4Clearance(){
+        return startEnd(null, this::forward).until(ElevatorSubsystem.L4AchieveHorizontalElevatorClearance());
+        // run(null).onlyWhile(ElevatorSubsystem.L4AchieveHorizontalElevatorClearance()).finallyDo(this::forward);
+    }
+    public Command HElevatorForwardWithL3Clearance(){
+        return startEnd(null, this::forward).until(ElevatorSubsystem.L3AchieveHorizontalElevatorClearance());
+        // run(null).onlyWhile(ElevatorSubsystem.L4AchieveHorizontalElevatorClearance()).finallyDo(this::forward);
+    }
+    public Command HElevatorForwardWithL2Clearance(){
+        return startEnd(null, this::forward).until(ElevatorSubsystem.L2AchieveHorizontalElevatorClearance());
+        // run(null).onlyWhile(ElevatorSubsystem.L4AchieveHorizontalElevatorClearance()).finallyDo(this::forward);
+    }
+    public Command MoveHEBack(){
+        return run(this::back);
+    }
+    
 
-    public Command forward()
+    public void forward()
     {
-        return this.runOnce(
-            () -> 
+        
             closedLoopController.setReference(43, ControlType.kMAXMotionPositionControl,
-          ClosedLoopSlot.kSlot0));
+          ClosedLoopSlot.kSlot0);
     }
 
-    public Command back()
+
+    public void back()
     {
-        return this.runOnce(
-            () -> 
+        
             closedLoopController.setReference(0, ControlType.kMAXMotionPositionControl,
-          ClosedLoopSlot.kSlot0));
+          ClosedLoopSlot.kSlot0);
     }
 
     public int getTargetPosition()

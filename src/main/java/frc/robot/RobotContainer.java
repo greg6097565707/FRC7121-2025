@@ -118,36 +118,51 @@ public static BooleanSupplier isNotAlignedLeft() {
     //         () -> m_robotDrive.setX(),
     //         m_robotDrive));
 
-    new JoystickButton(m_driverController, XboxController.Button.kA.value)
-      .onTrue(m_robotDrive.AutoAlignRight().andThen(elevatorSubsystem.raiseElevatorTop().alongWith(horizontalElevatorSubsystem.forward())));
+    new JoystickButton(m_driverController, XboxController.Button.kY.value)
+      .onTrue(m_robotDrive.AutoAlignRight().andThen(elevatorSubsystem.raiseElevatorL4().alongWith(horizontalElevatorSubsystem.HElevatorForwardWithL4Clearance())
+      .andThen(newIntakeSubsystem.ScoreIntakeCoral()).andThen(elevatorSubsystem.lowerElevator().alongWith(horizontalElevatorSubsystem.MoveHEBack()))));
       
+    new JoystickButton(m_driverController, XboxController.Button.kB.value)
+      .onTrue(m_robotDrive.AutoAlignRight().andThen(elevatorSubsystem.raiseElevatorL3().alongWith(horizontalElevatorSubsystem.HElevatorForwardWithL3Clearance())
+      .andThen(newIntakeSubsystem.ScoreIntakeCoral()).andThen(elevatorSubsystem.lowerElevator().alongWith(horizontalElevatorSubsystem.MoveHEBack()))));
 
+      new JoystickButton(m_driverController, XboxController.Button.kA.value)
+      .onTrue(m_robotDrive.AutoAlignRight().andThen(elevatorSubsystem.raiseElevatorL2().alongWith(horizontalElevatorSubsystem.HElevatorForwardWithL2Clearance())
+      .andThen(newIntakeSubsystem.ScoreIntakeCoral()).andThen(elevatorSubsystem.lowerElevator().alongWith(horizontalElevatorSubsystem.MoveHEBack()))));
     // new JoystickButton(m_driverController, XboxController.Button.kX.value)
     //   .onTrue(elevatorSubsystem.raiseElevatorMid());
 
-    new JoystickButton(m_driverController, XboxController.Button.kB.value)
-      .onTrue(elevatorSubsystem.lowerElevator().alongWith(horizontalElevatorSubsystem.back()).alongWith(newIntakeSubsystem.stopManual()));
+    // new JoystickButton(m_driverController, XboxController.Button.kB.value)
+    //   .onTrue(elevatorSubsystem.lowerElevator().alongWith(horizontalElevatorSubsystem.MoveHEBack()).alongWith(newIntakeSubsystem.stopManual()));
 
 
-    new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
-    // .whileTrue(
-      .onTrue(m_robotDrive.AutoAlignRight()
-        // new RunCommand(
-        //   () -> m_robotDrive.drive(
-        //     m_robotDrive.limelightXSpeed(),
-        //     m_robotDrive.limelightYSpeed(),
-        //     m_robotDrive.limelightRotateToTarget(),
-        //     false),
-        //     m_robotDrive)
-      );
-    new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value)
-      .onTrue(m_robotDrive.AutoAlignLeft());
+    // new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
+    // // .whileTrue(
+    //   .onTrue(m_robotDrive.AutoAlignRight()
+    //     // new RunCommand(
+    //     //   () -> m_robotDrive.drive(
+    //     //     m_robotDrive.limelightXSpeed(),
+    //     //     m_robotDrive.limelightYSpeed(),
+    //     //     m_robotDrive.limelightRotateToTarget(),
+    //     //     false),
+    //     //     m_robotDrive)
+    //   );
+
+
+
+    // new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value)
+    //   .onTrue(m_robotDrive.AutoAlignLeft());
  
-    new JoystickButton(m_driverController, XboxController.Button.kX.value)
-      .onTrue(newIntakeSubsystem.IntakeCoralSubstation().alongWith(elevatorSubsystem.raiseElevatorIntake())
-      .andThen(elevatorSubsystem.lowerElevator()));
-      new JoystickButton(m_driverController, XboxController.Button.kY.value)
-      .whileTrue(newIntakeSubsystem.IntakeManual());
+
+      // 2/21/25 working
+    // new JoystickButton(m_driverController, XboxController.Button.kX.value)
+    //   .onTrue(newIntakeSubsystem.IntakeCoralSubstation().alongWith(elevatorSubsystem.raiseElevatorIntake())
+    //   .andThen(elevatorSubsystem.lowerElevator()));
+    //   new JoystickButton(m_driverController, XboxController.Button.kY.value)
+    //   .whileTrue(newIntakeSubsystem.IntakeManual());
+
+
+
     // new JoystickButton(m_driverController, XboxController.Button.kY.value)
     //   .whileTrue(newIntakeSubsystem.outTake());
     
