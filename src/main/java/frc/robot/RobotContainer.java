@@ -30,6 +30,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+
 import java.util.List;
 import java.util.function.BooleanSupplier;
 
@@ -52,6 +54,9 @@ public class RobotContainer {
   private final NewIntakeSubsystem newIntakeSubsystem = new NewIntakeSubsystem();
 
   private final SendableChooser<Command> autoChooser;
+
+  private boolean isInCoralMode = true;
+
 
 
   // The driver's controller
@@ -86,9 +91,12 @@ public static BooleanSupplier isNotAlignedLeft() {
     // Configure the button bindings
     configureButtonBindings();
     
-    autoChooser = AutoBuilder.buildAutoChooser("Test Auto");
-    
+    autoChooser = AutoBuilder.buildAutoChooser();
 
+    //ADD DIFFERENT AUTOS
+    //autoChooser.addOption("Complex Auto", m_complexAuto);
+    
+    SmartDashboard.putData("Autos", autoChooser);
 
     // Configure default commands
     m_robotDrive.setDefaultCommand(
@@ -118,17 +126,54 @@ public static BooleanSupplier isNotAlignedLeft() {
     //         () -> m_robotDrive.setX(),
     //         m_robotDrive));
 
-    new JoystickButton(m_driverController, XboxController.Button.kY.value)
-      .onTrue(m_robotDrive.AutoAlignRight().andThen(elevatorSubsystem.raiseElevatorL4().alongWith(horizontalElevatorSubsystem.HElevatorForwardWithL4Clearance())
-      .andThen(newIntakeSubsystem.ScoreIntakeCoral()).andThen(elevatorSubsystem.lowerElevator().alongWith(horizontalElevatorSubsystem.MoveHEBack()))));
-      
-    new JoystickButton(m_driverController, XboxController.Button.kB.value)
-      .onTrue(m_robotDrive.AutoAlignRight().andThen(elevatorSubsystem.raiseElevatorL3().alongWith(horizontalElevatorSubsystem.HElevatorForwardWithL3Clearance())
-      .andThen(newIntakeSubsystem.ScoreIntakeCoral()).andThen(elevatorSubsystem.lowerElevator().alongWith(horizontalElevatorSubsystem.MoveHEBack()))));
+    if(m_driverController.getYButtonPressed())
+      isInCoralMode = !isInCoralMode;
 
-      new JoystickButton(m_driverController, XboxController.Button.kA.value)
-      .onTrue(m_robotDrive.AutoAlignRight().andThen(elevatorSubsystem.raiseElevatorL2().alongWith(horizontalElevatorSubsystem.HElevatorForwardWithL2Clearance())
-      .andThen(newIntakeSubsystem.ScoreIntakeCoral()).andThen(elevatorSubsystem.lowerElevator().alongWith(horizontalElevatorSubsystem.MoveHEBack()))));
+    if (isInCoralMode)
+    {
+      new JoystickButton(m_driverController, XboxController.Button.kY.value).and(new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value))
+        .onTrue(m_robotDrive.AutoAlignRight().andThen(elevatorSubsystem.raiseElevatorL4().alongWith(horizontalElevatorSubsystem.HElevatorForwardWithL4Clearance())
+        .andThen(newIntakeSubsystem.ScoreIntakeCoral()).andThen(elevatorSubsystem.lowerElevator().alongWith(horizontalElevatorSubsystem.MoveHEBack()))));
+
+      new JoystickButton(m_driverController, XboxController.Button.kY.value).and(new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value))
+        .onTrue(m_robotDrive.AutoAlignRight().andThen(elevatorSubsystem.raiseElevatorL4().alongWith(horizontalElevatorSubsystem.HElevatorForwardWithL4Clearance())
+        .andThen(newIntakeSubsystem.ScoreIntakeCoral()).andThen(elevatorSubsystem.lowerElevator().alongWith(horizontalElevatorSubsystem.MoveHEBack()))));
+        
+      new JoystickButton(m_driverController, XboxController.Button.kB.value).and(new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value))
+        .onTrue(m_robotDrive.AutoAlignRight().andThen(elevatorSubsystem.raiseElevatorL3().alongWith(horizontalElevatorSubsystem.HElevatorForwardWithL3Clearance())
+        .andThen(newIntakeSubsystem.ScoreIntakeCoral()).andThen(elevatorSubsystem.lowerElevator().alongWith(horizontalElevatorSubsystem.MoveHEBack()))));
+
+      new JoystickButton(m_driverController, XboxController.Button.kA.value).and(new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value))
+        .onTrue(m_robotDrive.AutoAlignRight().andThen(elevatorSubsystem.raiseElevatorL2().alongWith(horizontalElevatorSubsystem.HElevatorForwardWithL2Clearance())
+        .andThen(newIntakeSubsystem.ScoreIntakeCoral()).andThen(elevatorSubsystem.lowerElevator().alongWith(horizontalElevatorSubsystem.MoveHEBack()))));
+
+
+
+      new JoystickButton(m_driverController, XboxController.Button.kY.value).and(new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value))
+        .onTrue(m_robotDrive.AutoAlignLeft().andThen(elevatorSubsystem.raiseElevatorL4().alongWith(horizontalElevatorSubsystem.HElevatorForwardWithL4Clearance())
+        .andThen(newIntakeSubsystem.ScoreIntakeCoral()).andThen(elevatorSubsystem.lowerElevator().alongWith(horizontalElevatorSubsystem.MoveHEBack()))));
+    
+      new JoystickButton(m_driverController, XboxController.Button.kY.value).and(new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value))
+          .onTrue(m_robotDrive.AutoAlignLeft().andThen(elevatorSubsystem.raiseElevatorL4().alongWith(horizontalElevatorSubsystem.HElevatorForwardWithL4Clearance())
+          .andThen(newIntakeSubsystem.ScoreIntakeCoral()).andThen(elevatorSubsystem.lowerElevator().alongWith(horizontalElevatorSubsystem.MoveHEBack()))));
+          
+      new JoystickButton(m_driverController, XboxController.Button.kB.value).and(new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value))
+          .onTrue(m_robotDrive.AutoAlignLeft().andThen(elevatorSubsystem.raiseElevatorL3().alongWith(horizontalElevatorSubsystem.HElevatorForwardWithL3Clearance())
+          .andThen(newIntakeSubsystem.ScoreIntakeCoral()).andThen(elevatorSubsystem.lowerElevator().alongWith(horizontalElevatorSubsystem.MoveHEBack()))));
+    
+      new JoystickButton(m_driverController, XboxController.Button.kA.value).and(new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value))
+          .onTrue(m_robotDrive.AutoAlignLeft().andThen(elevatorSubsystem.raiseElevatorL2().alongWith(horizontalElevatorSubsystem.HElevatorForwardWithL2Clearance())
+          .andThen(newIntakeSubsystem.ScoreIntakeCoral()).andThen(elevatorSubsystem.lowerElevator().alongWith(horizontalElevatorSubsystem.MoveHEBack()))));
+    }
+    else 
+    {
+      //input algae commands
+    }
+
+
+
+
+
     // new JoystickButton(m_driverController, XboxController.Button.kX.value)
     //   .onTrue(elevatorSubsystem.raiseElevatorMid());
 

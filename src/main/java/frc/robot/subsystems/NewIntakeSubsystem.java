@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.util.function.BooleanSupplier;
+
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -60,7 +62,9 @@ public class NewIntakeSubsystem extends SubsystemBase {
         return startEnd(this::intake, this::stop).until(RobotContainer.D_INTAKE_IR.supplier);
     }
     public Command ScoreIntakeCoral(){
-        return startEnd(this::intake, this::stop).until(RobotContainer.D_INTAKE_IR.supplier);//need to figure out how invert the supplier
+        return startEnd(this::intake, this::stop).until(() -> {
+            return !RobotContainer.D_INTAKE_IR.supplier.getAsBoolean();
+        });
     }
     public void intake()
     {
