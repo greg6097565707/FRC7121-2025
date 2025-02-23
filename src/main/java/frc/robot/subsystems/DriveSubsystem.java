@@ -58,12 +58,20 @@ private BooleanSupplier hasTagAndIsNotAligned() {
     return (BooleanSupplier) () -> false;
   }
 }
+
 private IntakeIR iir;
+
 public Command AutoAlignRight() {
   return run(this::autoAlignDriveRight).onlyWhile(hasTagAndIsNotAligned()).withTimeout(2.5);
 }
 public Command AutoAlignLeft() {
   return run(this::autoAlignDriveLeft).onlyWhile(RobotContainer.isNotAlignedLeft()).withTimeout(2.5);
+}
+public Command AutoAlignMiddle(){
+  return run(this::autoAlignDriveMiddle).onlyWhile(RobotContainer.isNotAlignedMiddle()).withTimeout(2.5);
+}
+public Command AutoAlignFar(){
+  return run(this::autoAlignDriveFar).onlyWhile(RobotContainer.isNotAlignedFar()).withTimeout(2.5);
 }
 public void autoAlignDriveRight() {
   this.drive(limelightXSpeed(), 
@@ -78,7 +86,19 @@ public void autoAlignDriveLeft() {
   false);
 }
 
+public void autoAlignDriveMiddle() {
+  this.drive(limelightXSpeed(), 
+  limelightYSpeedAlignmiddle(), 
+  limelightRotateToTarget(), 
+  false);
+}
 
+public void autoAlignDriveFar() {
+  this.drive(limelightXSpeedFar(), 
+  limelightYSpeedAlignmiddle(), 
+  limelightRotateToTarget(), 
+  false);
+}
   public final TalonFX talonFrontLeft = new TalonFX(DriveConstants.kFrontLeftDrivingCanId);
   private final MAXSwerveModule m_frontLeft = new MAXSwerveModule(
     talonFrontLeft,
@@ -401,62 +421,7 @@ public void autoAlignDriveLeft() {
     // // kP (constant of proportionality)
     // // this is a hand-tuned number that determines the aggressiveness of our proportional control loop
     // // if it is too high, the robot will oscillate around.
-    // // if it is too low, the robot will never reach its target
-    // // if the robot never turns in the correct direction, kP should be inverted.
-    // double kP = .0006;
-
-    // // tx ranges from (-hfov/2) to (hfov/2) in degrees. If your target is on the rightmost edge of 
-    // // your limelight 3 feed, tx should return roughly 31 degrees.
-    // double targetingAngularVelocity = (LimelightHelpers.getTX("limelight")-0) * kP;
-
-    // // convert to radians per second for our drive method
-    // targetingAngularVelocity *= DriveConstants.kMaxAngularSpeed;
-
-    // //invert since tx is positive when the target is to the right of the crosshair
-    // targetingAngularVelocity *= -1.0;
-
-    // return targetingAngularVelocity;
-
-    // double TAGID = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0); 
-    // SmartDashboard.putNumber("TagId", TAGID);
-      // double id = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDoubleArray(new double[6]);
-
-    // double rotationValue = 90;
-    //   // way to ratote to desired angle using tag id
-    // if (TAGID == 7 || TAGID == 18)
-    // {
-    //   rotationValue = 0;
-    // }
-    // else if (TAGID == 8 || TAGID == 17)
-    // {
-    //   rotationValue = 60;
-    // }
-    // else if (TAGID == 9 || TAGID == 22)
-    // {
-    //   rotationValue = 120;
-    // }
-    // else if (TAGID == 10 || TAGID == 21)
-    // {
-    //   rotationValue = 180;
-    // }
-    // else if (TAGID == 11 || TAGID == 20)
-    // {
-    //   rotationValue = -120;
-    // }
-    // else if (TAGID == 6 || TAGID == 19)
-    // {
-    //   rotationValue = 300;
-    // }
-
-      // if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red)
-      // {
-      //   rotationValue = (21 - NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0)) * 60;
-      // }
-      // else if (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue)
-      // {
-      //   rotationValue = (10 - NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0)) * 60;
-      // }
-
+    // // if it is too low, the robot will never reach its targget
     return ((getTrueHeading() - rotationValue)) * -0.008;
   }
   // alignment Y speed Right
@@ -476,6 +441,12 @@ public void autoAlignDriveLeft() {
     Pose3d targetingYSpeed = LimelightHelpers.getBotPose3d_TargetSpace("limelight");
     return (targetingYSpeed.getX()+autoAlignYoffsetLeft) * kP;
   }
+  public double limelightYSpeedAlignmiddle()
+  {
+    double kP = .25;
+    Pose3d targetingYSpeed = LimelightHelpers.getBotPose3d_TargetSpace("limelight");
+    return (targetingYSpeed.getX()) * kP;
+  }
 
 
 
@@ -486,6 +457,16 @@ public void autoAlignDriveLeft() {
   {    
     double kP = .001;
     double targetingForwardSpeed = (LimelightHelpers.getTY("limelight")+autoAlignXoffset) * kP;
+    targetingForwardSpeed *= DriveConstants.kMaxSpeedMetersPerSecond;
+    targetingForwardSpeed *= -1.0;
+    return targetingForwardSpeed;
+  }
+
+  public static final double autoAlignXoffsetFar = 0;// if your limelight and target are mounted at the same or similar heights, use "ta" (area) for target ranging rather than "ty"
+  public double limelightXSpeedFar()
+  {    
+    double kP = .001;
+    double targetingForwardSpeed = (LimelightHelpers.getTY("limelight")+autoAlignXoffsetFar) * kP;
     targetingForwardSpeed *= DriveConstants.kMaxSpeedMetersPerSecond;
     targetingForwardSpeed *= -1.0;
     return targetingForwardSpeed;

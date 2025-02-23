@@ -55,7 +55,7 @@ public class RobotContainer {
 
   private final SendableChooser<Command> autoChooser;
 
-  private boolean isInCoralMode = true;
+  public boolean isInCoralMode = true;
 
 
 
@@ -77,6 +77,24 @@ public static BooleanSupplier isNotAlignedLeft() {
   return (BooleanSupplier) () -> {
       if (Math.abs(targetingYSpeed.getX()+DriveSubsystem.autoAlignYoffsetLeft) > 0.04
       &&  (Math.abs(LimelightHelpers.getTY("limelight")+DriveSubsystem.autoAlignXoffset)) > 0.3 ) {
+          return true;
+      } else return false;
+  };
+}
+public static BooleanSupplier isNotAlignedMiddle() {
+  Pose3d targetingYSpeed = LimelightHelpers.getBotPose3d_TargetSpace("limelight");
+  return (BooleanSupplier) () -> {
+      if (Math.abs(targetingYSpeed.getX()) > 0.04
+      &&  (Math.abs(LimelightHelpers.getTY("limelight")+DriveSubsystem.autoAlignXoffset)) > 0.3 ) {
+          return true;
+      } else return false;
+  };
+}
+public static BooleanSupplier isNotAlignedFar() {
+  Pose3d targetingYSpeed = LimelightHelpers.getBotPose3d_TargetSpace("limelight");
+  return (BooleanSupplier) () -> {
+      if (Math.abs(targetingYSpeed.getX()) > 0.04
+      &&  (Math.abs(LimelightHelpers.getTY("limelight")+DriveSubsystem.autoAlignXoffsetFar)) > 0.3 ) {
           return true;
       } else return false;
   };
@@ -167,6 +185,8 @@ public static BooleanSupplier isNotAlignedLeft() {
     }
     else 
     {
+      new JoystickButton(m_driverController, XboxController.Button.kA.value)
+      .onTrue(m_robotDrive.AutoAlignFar().andThen(m_robotDrive.AutoAlignMiddle()));
       //input algae commands
     }
 
