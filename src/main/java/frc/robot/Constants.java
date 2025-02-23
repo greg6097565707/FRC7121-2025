@@ -117,7 +117,7 @@ public final class Constants {
 
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
-    public static final double kDriveDeadband = 0.1;
+    public static final double kDriveDeadband = 0.15;
     public static final double driveSensitivity = .5; // 0.0 - 1.0
   }
 

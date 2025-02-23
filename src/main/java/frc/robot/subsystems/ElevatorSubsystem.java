@@ -25,38 +25,38 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 public class ElevatorSubsystem extends SubsystemBase {
 
-    private static SparkMax leader;
-        private SparkMax follower;
-        private SparkClosedLoopController closedLoopController;
-        private RelativeEncoder encoder;
-        private int targetPosition;
-    
-        public ElevatorSubsystem() {
-            
-            leader = new SparkMax(Constants.ElevatorConstants.leaderID , MotorType.kBrushless);
-            follower = new SparkMax(Constants.ElevatorConstants.followerID, MotorType.kBrushless);
-    
-            targetPosition = 30;
-    
-            closedLoopController = leader.getClosedLoopController();
-            encoder = leader.getEncoder();
-    
-            SparkMaxConfig globalConfig = new SparkMaxConfig();
-            SparkMaxConfig leaderConfig = new SparkMaxConfig();
-            SparkMaxConfig followerConfig = new SparkMaxConfig();
-    
-            // leaderConfig.encoder.setPositionConversionFactor(1);
-            leaderConfig.encoder.positionConversionFactor(1);
-    
-            /*
-            * Configure the closed loop controller. We want to make sure we set the
-            * feedback sensor as the primary encoder.
-            */
-            leaderConfig.closedLoop
+    private SparkMax leader;
+    private SparkMax follower;
+    private SparkClosedLoopController closedLoopController;
+    private RelativeEncoder encoder;
+    private int targetPosition;
+
+    public ElevatorSubsystem() {
+
+        leader = new SparkMax(Constants.ElevatorConstants.leaderID, MotorType.kBrushless);
+        follower = new SparkMax(Constants.ElevatorConstants.followerID, MotorType.kBrushless);
+
+        targetPosition = 30;
+
+        closedLoopController = leader.getClosedLoopController();
+        encoder = leader.getEncoder();
+
+        SparkMaxConfig globalConfig = new SparkMaxConfig();
+        SparkMaxConfig leaderConfig = new SparkMaxConfig();
+        SparkMaxConfig followerConfig = new SparkMaxConfig();
+
+        // leaderConfig.encoder.setPositionConversionFactor(1);
+        leaderConfig.encoder.positionConversionFactor(1);
+
+        /*
+         * Configure the closed loop controller. We want to make sure we set the
+         * feedback sensor as the primary encoder.
+         */
+        leaderConfig.closedLoop
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
                 // Set PID values for position control. We don't need to pass a closed
                 // loop slot, as it will default to slot 0.
-                .p(0.01)
+                .p(0.008)
                 .i(0.)
                 .d(0)
                 .outputRange(-1, 1)
@@ -66,8 +66,8 @@ public class ElevatorSubsystem extends SubsystemBase {
                 .d(0, ClosedLoopSlot.kSlot1)
                 // .velocityFF(1.0 / 5767, ClosedLoopSlot.kSlot1)
                 .outputRange(-1, 1, ClosedLoopSlot.kSlot1);
-    
-            leaderConfig.closedLoop.maxMotion
+
+        leaderConfig.closedLoop.maxMotion
                 // Set MAXMotion parameters for position control. We don't need to pass
                 // a closed loop slot, as it will default to slot 0.
                 .maxVelocity(4000)
@@ -77,112 +77,97 @@ public class ElevatorSubsystem extends SubsystemBase {
                 .maxAcceleration(15000, ClosedLoopSlot.kSlot1)
                 .maxVelocity(10000, ClosedLoopSlot.kSlot1)
                 .allowedClosedLoopError(1, ClosedLoopSlot.kSlot1);
-    
-    
-            /*
-            * Set parameters that will apply to all SPARKs. We will also use this as
-            * the left leader config.
-            */
-            globalConfig
+
+        /*
+         * Set parameters that will apply to all SPARKs. We will also use this as
+         * the left leader config.
+         */
+        globalConfig
                 .smartCurrentLimit(50)
                 .idleMode(IdleMode.kBrake);
-    
-            // Apply the global config and invert since it is on the opposite side
-            leaderConfig
+
+        // Apply the global config and invert since it is on the opposite side
+        leaderConfig
                 .apply(globalConfig);
-    
-            // Apply the global config and set the leader SPARK for follower mode
-            followerConfig
+
+        // Apply the global config and set the leader SPARK for follower mode
+        followerConfig
                 .apply(globalConfig)
                 .follow(leader, true);
-    
-            /*
-            * Apply the configuration to the SPARKs.
-            *
-            * kResetSafeParameters is used to get the SPARK MAX to a known state. This
-            * is useful in case the SPARK MAX is replaced.
-            *
-            * kPersistParameters is used to ensure the configuration is not lost when
-            * the SPARK MAX loses power. This is useful for power cycles that may occur
-            * mid-operation.
-            */
-            leader.configure(leaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-            follower.configure(followerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        }
-        // public Command RasiseWhileAligning(){
-        //     return run(null).onlyWhile(RobotContainer.isNotAligned()).finallyDo(this::raiseElevatorTop);
-        // }
-        public static BooleanSupplier L4AchieveHorizontalElevatorClearance() {
-            return (BooleanSupplier) () -> {
-          if (leader.getEncoder().getPosition() < 45) {//find value
-          return true;
-      } else return false;
-    };
+
+        /*
+         * Apply the configuration to the SPARKs.
+         *
+         * kResetSafeParameters is used to get the SPARK MAX to a known state. This
+         * is useful in case the SPARK MAX is replaced.
+         *
+         * kPersistParameters is used to ensure the configuration is not lost when
+         * the SPARK MAX loses power. This is useful for power cycles that may occur
+         * mid-operation.
+         */
+        leader.configure(leaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        follower.configure(followerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
-    public static BooleanSupplier L3AchieveHorizontalElevatorClearance() {
+    // public Command RasiseWhileAligning(){
+    // return
+    // run(null).onlyWhile(RobotContainer.isNotAligned()).finallyDo(this::raiseElevatorTop);
+    // }
+    public BooleanSupplier L4AchieveHorizontalElevatorClearance() {
         return (BooleanSupplier) () -> {
-      if (leader.getEncoder().getPosition() < 30) {//find value
-          return true;
-      } else return false;
-    };
+            return this.leader.getEncoder().getPosition() < 40;
+        };
     }
 
-    public static BooleanSupplier L2AchieveHorizontalElevatorClearance() {
+    public BooleanSupplier L3AchieveHorizontalElevatorClearance() {
         return (BooleanSupplier) () -> {
-      if (leader.getEncoder().getPosition() < 30) {//find value
-          return true;
-      } else return false;
-    };
-    }
-    public Command raiseElevatorIntake()
-    {
-        return this.runOnce(
-            () -> 
-            closedLoopController.setReference(10, ControlType.kMAXMotionPositionControl,//50
-          ClosedLoopSlot.kSlot0));
-    }
-    public Command raiseElevatorL4()
-    {
-        return this.runOnce(
-            () -> 
-            closedLoopController.setReference(50, ControlType.kMAXMotionPositionControl,//50
-          ClosedLoopSlot.kSlot0));
+            return this.leader.getEncoder().getPosition() < 23;
+        };
     }
 
-    public Command raiseElevatorL3()
-    {
-        return this.runOnce(
-            () -> 
-            closedLoopController.setReference(30, ControlType.kMAXMotionPositionControl,
-          ClosedLoopSlot.kSlot0));
+    public BooleanSupplier L2AchieveHorizontalElevatorClearance() {
+        return (BooleanSupplier) () -> {
+            return this.leader.getEncoder().getPosition() < 8;
+        };
     }
 
-    public Command raiseElevatorL2()
-    {
+    public Command raiseElevatorIntake() {
         return this.runOnce(
-            () -> 
-            closedLoopController.setReference(25, ControlType.kMAXMotionPositionControl,
-          ClosedLoopSlot.kSlot0));
+                () -> closedLoopController.setReference(10, ControlType.kMAXMotionPositionControl, // 50
+                        ClosedLoopSlot.kSlot0));
     }
 
-    public Command lowerElevator()
-    {
+    public Command raiseElevatorL4() {
         return this.runOnce(
-            () -> 
-            closedLoopController.setReference(0, ControlType.kMAXMotionPositionControl,
-          ClosedLoopSlot.kSlot1));
+                () -> closedLoopController.setReference(50, ControlType.kMAXMotionPositionControl, // 50
+                        ClosedLoopSlot.kSlot0));
     }
 
-    public int getTargetPosition()
-    {
+    public Command raiseElevatorL3() {
+        return this.runOnce(
+                () -> closedLoopController.setReference(27, ControlType.kMAXMotionPositionControl,
+                        ClosedLoopSlot.kSlot0));
+    }
+
+    public Command raiseElevatorL2() {
+        return this.runOnce(
+                () -> closedLoopController.setReference(13, ControlType.kMAXMotionPositionControl,
+                        ClosedLoopSlot.kSlot0));
+    }
+
+    public Command lowerElevator() {
+        return this.runOnce(
+                () -> closedLoopController.setReference(0, ControlType.kMAXMotionPositionControl,
+                        ClosedLoopSlot.kSlot1));
+    }
+
+    public int getTargetPosition() {
         return targetPosition;
     }
 
-
-     @Override
+    @Override
     public void periodic() {
         SmartDashboard.putNumber("elevator encoder", leader.getEncoder().getPosition());
-        
+
     }
 }

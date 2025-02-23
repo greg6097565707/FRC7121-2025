@@ -97,20 +97,20 @@ public class HorizontalElevatorSubsystem extends SubsystemBase {
         leader.configure(leaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
     public Command HElevatorForwardWithL4Clearance(){
-        return startEnd(null, this::forward).until(ElevatorSubsystem.L4AchieveHorizontalElevatorClearance());
-        // run(null).onlyWhile(ElevatorSubsystem.L4AchieveHorizontalElevatorClearance()).finallyDo(this::forward);
+        return run(this::back).onlyWhile(RobotContainer.elevatorSubsystem.L4AchieveHorizontalElevatorClearance()).finallyDo(this::forward);
     }
     public Command HElevatorForwardWithL3Clearance(){
-        return startEnd(null, this::forward).until(ElevatorSubsystem.L3AchieveHorizontalElevatorClearance());
+        return run(this::back).onlyWhile(RobotContainer.elevatorSubsystem.L3AchieveHorizontalElevatorClearance()).finallyDo(this::forward);
         // run(null).onlyWhile(ElevatorSubsystem.L4AchieveHorizontalElevatorClearance()).finallyDo(this::forward);
     }
     public Command HElevatorForwardWithL2Clearance(){
-        return startEnd(null, this::forward).until(ElevatorSubsystem.L2AchieveHorizontalElevatorClearance());
+        return run(this::back).onlyWhile(RobotContainer.elevatorSubsystem.L2AchieveHorizontalElevatorClearance()).finallyDo(this::forward);
         // run(null).onlyWhile(ElevatorSubsystem.L4AchieveHorizontalElevatorClearance()).finallyDo(this::forward);
     }
     public Command MoveHEBack(){
         return run(this::back);
     }
+    
     
 
     public void forward()

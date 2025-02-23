@@ -66,6 +66,9 @@ public class NewIntakeSubsystem extends SubsystemBase {
             return !RobotContainer.D_INTAKE_IR.supplier.getAsBoolean();
         });
     }
+    public Command runIntake(){
+        return startEnd(this::intake, this::stop);
+    }
     public void intake()
     {
         leader.set(0.5);

@@ -52,7 +52,7 @@ import com.studica.frc.AHRS.BoardAxis;
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
 private BooleanSupplier hasTagAndIsNotAligned() {
-  if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0)!=-1 && RobotContainer.isNotAlignedRight().getAsBoolean()) {
+  if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0)!=-1 || RobotContainer.isNotAlignedRight().getAsBoolean()) {
     return (BooleanSupplier) () -> true;
   } else {
     return (BooleanSupplier) () -> false;
@@ -62,16 +62,16 @@ private BooleanSupplier hasTagAndIsNotAligned() {
 private IntakeIR iir;
 
 public Command AutoAlignRight() {
-  return run(this::autoAlignDriveRight).onlyWhile(hasTagAndIsNotAligned()).withTimeout(2.5);
+  return run(this::autoAlignDriveRight).onlyWhile(hasTagAndIsNotAligned()).withTimeout(1.5).finallyDo(this::autoAlignStop);
 }
 public Command AutoAlignLeft() {
-  return run(this::autoAlignDriveLeft).onlyWhile(RobotContainer.isNotAlignedLeft()).withTimeout(2.5);
+  return run(this::autoAlignDriveLeft).onlyWhile(RobotContainer.isNotAlignedLeft()).withTimeout(1.5);
 }
 public Command AutoAlignMiddle(){
-  return run(this::autoAlignDriveMiddle).onlyWhile(RobotContainer.isNotAlignedMiddle()).withTimeout(2.5);
+  return run(this::autoAlignDriveMiddle).onlyWhile(RobotContainer.isNotAlignedMiddle()).withTimeout(1.5);
 }
 public Command AutoAlignFar(){
-  return run(this::autoAlignDriveFar).onlyWhile(RobotContainer.isNotAlignedFar()).withTimeout(2.5);
+  return run(this::autoAlignDriveFar).onlyWhile(RobotContainer.isNotAlignedFar()).withTimeout(1.5);
 }
 public void autoAlignDriveRight() {
   this.drive(limelightXSpeed(), 
@@ -97,6 +97,13 @@ public void autoAlignDriveFar() {
   this.drive(limelightXSpeedFar(), 
   limelightYSpeedAlignmiddle(), 
   limelightRotateToTarget(), 
+  false);
+}
+
+public void autoAlignStop() {
+  this.drive(0, 
+  0, 
+  0, 
   false);
 }
   public final TalonFX talonFrontLeft = new TalonFX(DriveConstants.kFrontLeftDrivingCanId);
@@ -236,7 +243,7 @@ public void autoAlignDriveFar() {
     }
     else if (TAGID == 11 || TAGID == 20)
     {
-      rotationValue = -120;
+      rotationValue = 120;
     }
     else if (TAGID == 6 || TAGID == 19)
     {
@@ -422,7 +429,7 @@ public void autoAlignDriveFar() {
     // // this is a hand-tuned number that determines the aggressiveness of our proportional control loop
     // // if it is too high, the robot will oscillate around.
     // // if it is too low, the robot will never reach its targget
-    return ((getTrueHeading() - rotationValue)) * -0.008;
+    return ((getTrueHeading() + rotationValue)%180) * -0.008;
   }
   // alignment Y speed Right
   public static final double autoAlignYoffsetRight = -.15;
@@ -434,7 +441,7 @@ public void autoAlignDriveFar() {
   }
 
   // alignment spped Y left
-  public static final double autoAlignYoffsetLeft = .2;
+  public static final double autoAlignYoffsetLeft = .18;
   public double limelightYSpeedAlignLeft()
   {
     double kP = .25;
