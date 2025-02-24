@@ -67,7 +67,7 @@ public class NewIntakeSubsystem extends SubsystemBase {
         });
     }
     public Command runIntake(){
-        return startEnd(this::intake, this::stop);
+        return startEnd(this::intake, this::stop).withTimeout(2);
     }
     public void intake()
     {

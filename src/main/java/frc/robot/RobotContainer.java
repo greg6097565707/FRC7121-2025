@@ -29,6 +29,7 @@ import frc.robot.subsystems.NewIntakeSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -36,6 +37,8 @@ import java.util.List;
 import java.util.function.BooleanSupplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -44,6 +47,9 @@ import com.pathplanner.lib.auto.AutoBuilder;
  * (including subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+  private String selectedAuto;
+  private final SendableChooser<String> autoChooser = new SendableChooser<>();
+  public static final SendableChooser<String> songChooser = new SendableChooser<>();
 
   
   // The robot's subsystems
@@ -53,7 +59,7 @@ public class RobotContainer {
   private final HorizontalElevatorSubsystem horizontalElevatorSubsystem = new HorizontalElevatorSubsystem();
   private final NewIntakeSubsystem newIntakeSubsystem = new NewIntakeSubsystem();
 
-  private final SendableChooser<Command> autoChooser;
+  
 
   public boolean isInCoralMode = true;
 
@@ -109,13 +115,15 @@ public static BooleanSupplier isNotAlignedFar() {
     
     // Configure the button bindings
     configureButtonBindings();
+    autoChooser.addOption("FarSide3Coral", "ExampleAuto");
+    autoChooser.addOption("Move", "MoveFromZone");
+    SmartDashboard.putData("Autos", autoChooser);
     
-    autoChooser = AutoBuilder.buildAutoChooser();
 
     //ADD DIFFERENT AUTOS
     //autoChooser.addOption("Complex Auto", m_complexAuto);
     
-    SmartDashboard.putData("Autos", autoChooser);
+    
 
     // Configure default commands
     m_robotDrive.setDefaultCommand(
@@ -128,6 +136,19 @@ public static BooleanSupplier isNotAlignedFar() {
                 -MathUtil.applyDeadband(m_driverController.getRightX() * OIConstants.driveSensitivity, OIConstants.kDriveDeadband),
                 true),
             m_robotDrive));
+    //pathplannerL4commands
+    NamedCommands.registerCommand("RightL4Score", m_robotDrive.AutoAlignRight().andThen(elevatorSubsystem.raiseElevatorL4().alongWith(horizontalElevatorSubsystem.HElevatorForwardWithL4Clearance())));
+    NamedCommands.registerCommand("LeftL4Score", m_robotDrive.AutoAlignLeft().andThen(elevatorSubsystem.raiseElevatorL4().alongWith(horizontalElevatorSubsystem.HElevatorForwardWithL4Clearance())));
+    //pathplannerL3Commands
+    NamedCommands.registerCommand("RightL3Score", m_robotDrive.AutoAlignRight().andThen(elevatorSubsystem.raiseElevatorL3().alongWith(horizontalElevatorSubsystem.HElevatorForwardWithL3Clearance())));
+    NamedCommands.registerCommand("LeftL3Score", m_robotDrive.AutoAlignLeft().andThen(elevatorSubsystem.raiseElevatorL3().alongWith(horizontalElevatorSubsystem.HElevatorForwardWithL3Clearance())));
+    //pathplnnerL2Commands
+    NamedCommands.registerCommand("RightL2Score", m_robotDrive.AutoAlignRight().andThen(elevatorSubsystem.raiseElevatorL2().alongWith(horizontalElevatorSubsystem.HElevatorForwardWithL2Clearance())));
+    NamedCommands.registerCommand("LeftL2Score", m_robotDrive.AutoAlignLeft().andThen(elevatorSubsystem.raiseElevatorL2().alongWith(horizontalElevatorSubsystem.HElevatorForwardWithL2Clearance())));
+    //intake
+    NamedCommands.registerCommand("Intake",newIntakeSubsystem.IntakeCoralSubstation().alongWith(elevatorSubsystem.raiseElevatorIntake()).andThen(elevatorSubsystem.lowerElevator()));
+    //Score
+    NamedCommands.registerCommand("score",newIntakeSubsystem.runIntake().andThen(new WaitCommand(1)).andThen(horizontalElevatorSubsystem.MoveHEBack().alongWith(elevatorSubsystem.lowerElevator())));
   }
 
   /**
@@ -212,47 +233,6 @@ public static BooleanSupplier isNotAlignedFar() {
 
 
 
-    // new JoystickButton(m_driverController, XboxController.Button.kX.value)
-    //   .onTrue(elevatorSubsystem.raiseElevatorMid());
-
-    // new JoystickButton(m_driverController, XboxController.Button.kB.value)
-    //   .onTrue(elevatorSubsystem.lowerElevator().alongWith(horizontalElevatorSubsystem.MoveHEBack()).alongWith(newIntakeSubsystem.stopManual()));
-
-
-    // new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
-    // // .whileTrue(
-    //   .onTrue(m_robotDrive.AutoAlignRight()
-    //     // new RunCommand(
-    //     //   () -> m_robotDrive.drive(
-    //     //     m_robotDrive.limelightXSpeed(),
-    //     //     m_robotDrive.limelightYSpeed(),
-    //     //     m_robotDrive.limelightRotateToTarget(),
-    //     //     false),
-    //     //     m_robotDrive)
-    //   );
-
-
-
-    // new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value)
-    //   .onTrue(m_robotDrive.AutoAlignLeft());
- 
-
-      // 2/21/25 working
-    // new JoystickButton(m_driverController, XboxController.Button.kX.value)
-    //   .onTrue(newIntakeSubsystem.IntakeCoralSubstation().alongWith(elevatorSubsystem.raiseElevatorIntake())
-    //   .andThen(elevatorSubsystem.lowerElevator()));
-    //   new JoystickButton(m_driverController, XboxController.Button.kY.value)
-    //   .whileTrue(newIntakeSubsystem.IntakeManual());
-
-
-
-    // new JoystickButton(m_driverController, XboxController.Button.kY.value)
-    //   .whileTrue(newIntakeSubsystem.outTake());
-    
-    
-    
-    // new JoystickButton(m_driverController, XboxController.Button.kY.value)
-    //   .onTrue(newIntakeSubsystem.outTake());
     
 
   }
@@ -263,7 +243,13 @@ public static BooleanSupplier isNotAlignedFar() {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-      return autoChooser.getSelected();
+    selectedAuto = autoChooser.getSelected();
+    if (selectedAuto == null) {
+        selectedAuto = "Move";
+    }
+    // System.out.println("Selected Auto: " + selectedAuto);
+    
+    return new PathPlannerAuto(selectedAuto);
 
   }
 }

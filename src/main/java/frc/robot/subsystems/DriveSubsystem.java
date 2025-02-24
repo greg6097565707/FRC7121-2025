@@ -51,8 +51,15 @@ import com.studica.frc.AHRS.BoardAxis;
 
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
-private BooleanSupplier hasTagAndIsNotAligned() {
-  if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0)!=-1 || RobotContainer.isNotAlignedRight().getAsBoolean()) {
+private BooleanSupplier hasTagAndIsNotAlignedRight() {
+  if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0)!=-1 && RobotContainer.isNotAlignedRight().getAsBoolean()) {
+    return (BooleanSupplier) () -> true;
+  } else {
+    return (BooleanSupplier) () -> false;
+  }
+}
+private BooleanSupplier hasTagAndIsNotAlignedLeft() {
+  if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0)!=-1 && RobotContainer.isNotAlignedLeft().getAsBoolean()) {
     return (BooleanSupplier) () -> true;
   } else {
     return (BooleanSupplier) () -> false;
@@ -62,10 +69,10 @@ private BooleanSupplier hasTagAndIsNotAligned() {
 private IntakeIR iir;
 
 public Command AutoAlignRight() {
-  return run(this::autoAlignDriveRight).onlyWhile(hasTagAndIsNotAligned()).withTimeout(1.5).finallyDo(this::autoAlignStop);
+  return run(this::autoAlignDriveRight).onlyWhile(hasTagAndIsNotAlignedRight()).withTimeout(1.5).finallyDo(this::autoAlignStop);
 }
 public Command AutoAlignLeft() {
-  return run(this::autoAlignDriveLeft).onlyWhile(RobotContainer.isNotAlignedLeft()).withTimeout(1.5);
+  return run(this::autoAlignDriveLeft).onlyWhile(hasTagAndIsNotAlignedLeft()).withTimeout(1.5);
 }
 public Command AutoAlignMiddle(){
   return run(this::autoAlignDriveMiddle).onlyWhile(RobotContainer.isNotAlignedMiddle()).withTimeout(1.5);
