@@ -12,6 +12,8 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -58,8 +60,15 @@ public class NewIntakeSubsystem extends SubsystemBase {
         leader.configure(leaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     }
+
+    @Override
+    public void periodic() {
+        SmartDashboard.putBoolean("IR Sensor", RobotContainer.D_INTAKE_IR.supplier.getAsBoolean());
+        SmartDashboard.putNumber("intake voltage", getVoltage());
+    }
+
     public Command IntakeCoralSubstation(){
-        return startEnd(this::intake, this::stop).until(RobotContainer.D_INTAKE_IR.supplier);
+        return startEnd(this::intake, this::stop).until(RobotContainer.D_INTAKE_IR.supplier).andThen(startEnd(this::rumbleController, this::stopRumble).withTimeout(2));
     }
     public Command ScoreIntakeCoral(){
         return startEnd(this::intake, this::stop).until(() -> {
@@ -98,5 +107,36 @@ public class NewIntakeSubsystem extends SubsystemBase {
     public boolean isPresent()
     {
         return irSensor.get();
+    }
+
+    public Command rumbleController()
+    {
+        return run(() -> {RobotContainer.m_driverController.setRumble(RumbleType.kBothRumble, 1);}) ;
+    }
+
+    public Command rumble()
+    {
+        return run(
+            () -> {rumbleController();
+            }).withTimeout(2).andThen(stopRumble());
+    }
+
+    public Command stopRumble()
+    {
+        return run(
+            () -> {RobotContainer.m_driverController.setRumble(RumbleType.kBothRumble, 0);
+            });
+    }
+
+    public double getVoltage()
+    {
+        return leader.getBusVoltage();
+    }
+
+    public BooleanSupplier hasBall()
+    {
+        return () -> {
+            return getVoltage() > 5;
+        };
     }
 }

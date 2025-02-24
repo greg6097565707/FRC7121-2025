@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
@@ -69,9 +70,11 @@ public class RobotContainer {
 
 
   // The driver's controller
-  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+  public static XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
 
   Trigger rTButton;
+  Trigger lTButton;
+
 
   // robot state boolean suppliers
 public static BooleanSupplier isNotAlignedRight() {
@@ -111,6 +114,9 @@ public static BooleanSupplier isNotAlignedFar() {
   };
 }
 
+//led's are connected to 17
+
+
 public static BooleanSupplier isRed(){
   Optional<Alliance> ally = DriverStation.getAlliance();
   return (BooleanSupplier) () -> {
@@ -142,7 +148,7 @@ public static BooleanSupplier isInIntakeZone(){
     
     // Configure the button bindings
     configureButtonBindings();
-    autoChooser.addOption("FarSide3Coral", "ExampleAuto");
+    autoChooser.addOption("FarSide3Coral", "FarSide3Coral");
     autoChooser.addOption("Move", "MoveFromZone");
     SmartDashboard.putData("Autos", autoChooser);
     
@@ -175,7 +181,7 @@ public static BooleanSupplier isInIntakeZone(){
     //intake
     NamedCommands.registerCommand("Intake",newIntakeSubsystem.IntakeCoralSubstation().alongWith(elevatorSubsystem.raiseElevatorIntake()).andThen(elevatorSubsystem.lowerElevator()));
     //Score
-    NamedCommands.registerCommand("score",newIntakeSubsystem.runIntake().andThen(new WaitCommand(1)).andThen(horizontalElevatorSubsystem.MoveHEBack().alongWith(elevatorSubsystem.lowerElevator())));
+    NamedCommands.registerCommand("Score",(new WaitCommand(1)).andThen(newIntakeSubsystem.runIntake()).andThen(new WaitCommand(1)).andThen(horizontalElevatorSubsystem.MoveHEBack().alongWith(elevatorSubsystem.lowerElevator())));
   }
 
   /**
@@ -197,20 +203,24 @@ public static BooleanSupplier isInIntakeZone(){
       { return m_driverController.getRightTriggerAxis() > 0.5;}
       );
 
+    lTButton = new Trigger(() -> 
+      { return m_driverController.getLeftTriggerAxis() > 0.5;}
+      );
+
     if(m_driverController.getYButtonPressed())
       isInCoralMode = !isInCoralMode;
 
     if (isInCoralMode)
     {
-      // intake
-      new JoystickButton(m_driverController, XboxController.Button.kX.value)
-         .onTrue(newIntakeSubsystem.IntakeCoralSubstation().alongWith(elevatorSubsystem.raiseElevatorIntake())
-         .andThen(elevatorSubsystem.lowerElevator()));
-        // L4
-      new JoystickButton(m_driverController, XboxController.Button.kY.value).and(new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value))
-        .onTrue(
-          m_robotDrive.AutoAlignRight().andThen(elevatorSubsystem.raiseElevatorL4().alongWith(horizontalElevatorSubsystem.HElevatorForwardWithL4Clearance())
-        ));
+        // intake
+        new JoystickButton(m_driverController, XboxController.Button.kX.value)
+          .onTrue(newIntakeSubsystem.IntakeCoralSubstation().alongWith(elevatorSubsystem.raiseElevatorIntake())
+          .andThen(elevatorSubsystem.lowerElevator()));
+          // L4
+        new JoystickButton(m_driverController, XboxController.Button.kY.value).and(new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value))
+          .onTrue(
+            m_robotDrive.AutoAlignRight().andThen(elevatorSubsystem.raiseElevatorL4().alongWith(horizontalElevatorSubsystem.HElevatorForwardWithL4Clearance())
+          ));
         new JoystickButton(m_driverController, XboxController.Button.kY.value).and(new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value))
         .onTrue(
           m_robotDrive.AutoAlignLeft().andThen(elevatorSubsystem.raiseElevatorL4().alongWith(horizontalElevatorSubsystem.HElevatorForwardWithL4Clearance())
@@ -243,11 +253,14 @@ public static BooleanSupplier isInIntakeZone(){
       rTButton
         .onTrue(newIntakeSubsystem.runIntake())
         .onFalse(elevatorSubsystem.lowerElevator().alongWith(horizontalElevatorSubsystem.MoveHEBack()));
+
+      lTButton
+        .onTrue(newIntakeSubsystem.IntakeManual());
       
 
-    new Trigger(isInIntakeZone())
-    .onTrue(newIntakeSubsystem.IntakeCoralSubstation().alongWith(elevatorSubsystem.raiseElevatorIntake())
-    .andThen(elevatorSubsystem.lowerElevator()));
+    // new Trigger(isInIntakeZone())
+    // .onTrue(newIntakeSubsystem.IntakeCoralSubstation().alongWith(elevatorSubsystem.raiseElevatorIntake())
+    // .andThen(elevatorSubsystem.lowerElevator()));
     
     }
     else 
@@ -255,6 +268,7 @@ public static BooleanSupplier isInIntakeZone(){
       // new JoystickButton(m_driverController, XboxController.Button.kA.value)
       // .onTrue(m_robotDrive.AutoAlignFar().andThen(m_robotDrive.AutoAlignMiddle()));
       //input algae commands
+
     }
 
 

@@ -279,6 +279,7 @@ public void autoAlignStop() {
     SmartDashboard.putNumber("True Heading", this.getTrueHeading());
     SmartDashboard.putNumber("Rotation Value", (rotationValue));
     SmartDashboard.putBoolean("intakeIR", this.iir.supplier.getAsBoolean());
+    SmartDashboard.putBoolean("tagandAuto", hasTagAndIsNotAlignedRight().getAsBoolean());
     // in DriveSubsystem.java
     
 
