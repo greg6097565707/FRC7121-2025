@@ -18,10 +18,13 @@ import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.LimelightHelpers.PoseEstimate;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.HorizontalElevatorSubsystem;
@@ -34,6 +37,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BooleanSupplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -70,7 +74,7 @@ public class RobotContainer {
   Trigger rTButton;
 
   // robot state boolean suppliers
-  public static BooleanSupplier isNotAlignedRight() {
+public static BooleanSupplier isNotAlignedRight() {
     Pose3d targetingYSpeed = LimelightHelpers.getBotPose3d_TargetSpace("limelight");
     return (BooleanSupplier) () -> {
         if (Math.abs(targetingYSpeed.getX()+DriveSubsystem.autoAlignYoffsetRight) > 0.04
@@ -106,6 +110,29 @@ public static BooleanSupplier isNotAlignedFar() {
       } else return false;
   };
 }
+
+public static BooleanSupplier isRed(){
+  Optional<Alliance> ally = DriverStation.getAlliance();
+  return (BooleanSupplier) () -> {
+    if (ally.get() == Alliance.Red){
+      return true;
+    } else return false;
+};
+}
+
+public static BooleanSupplier isInIntakeZone(){
+
+  LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
+  return (BooleanSupplier) () -> {
+    if ((mt2.pose.getX()<10 || mt2.pose.getX()>40) && (mt2.pose.getY() < 10 || mt2.pose.getY()>40)){
+      return true;
+    } else return false;
+    
+   
+};
+}
+
+
 // LimelightHelpers.getTY("limelight")+DriveSubsystem.autoAlignXoffset) < 0.01
 // Math.abs(targetingYSpeed.getX()+DriveSubsystem.autoAlignYoffsetRight) > 0.04
   /**
@@ -218,9 +245,10 @@ public static BooleanSupplier isNotAlignedFar() {
         .onFalse(elevatorSubsystem.lowerElevator().alongWith(horizontalElevatorSubsystem.MoveHEBack()));
       
 
-      // new JoystickButton(m_driverController, XboxController.Button.kA.value).and(new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value))
-      //     .onTrue(m_robotDrive.AutoAlignLeft().andThen(elevatorSubsystem.raiseElevatorL2().alongWith(horizontalElevatorSubsystem.HElevatorForwardWithL2Clearance())
-      //     .andThen(newIntakeSubsystem.ScoreIntakeCoral()).andThen(elevatorSubsystem.lowerElevator().alongWith(horizontalElevatorSubsystem.MoveHEBack()))));
+    new Trigger(isInIntakeZone())
+    .onTrue(newIntakeSubsystem.IntakeCoralSubstation().alongWith(elevatorSubsystem.raiseElevatorIntake())
+    .andThen(elevatorSubsystem.lowerElevator()));
+    
     }
     else 
     {
