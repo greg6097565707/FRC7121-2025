@@ -110,13 +110,24 @@ public class HorizontalElevatorSubsystem extends SubsystemBase {
     public Command MoveHEBack(){
         return run(this::back);
     }
+    public Command HElevatorForward(){
+        return run(this::forward);
+    }
+    public Command HElevatorBackAlage(){
+        return run(this::backAlgae);
+    }
     
     
-
     public void forward()
     {
         
             closedLoopController.setReference(43, ControlType.kMAXMotionPositionControl,
+          ClosedLoopSlot.kSlot0);
+    }
+    public void backAlgae()
+    {
+        
+            closedLoopController.setReference(35, ControlType.kMAXMotionPositionControl,
           ClosedLoopSlot.kSlot0);
     }
 

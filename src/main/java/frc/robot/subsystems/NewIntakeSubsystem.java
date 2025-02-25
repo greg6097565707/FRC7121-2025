@@ -60,11 +60,18 @@ public class NewIntakeSubsystem extends SubsystemBase {
         leader.configure(leaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     }
+    public BooleanSupplier isAlgaeGripped(){
+        return (BooleanSupplier) () -> {
+            if (this.leader.getOutputCurrent() > 10)
+            return true;
+            else return false;
+        };
+    }
 
     @Override
     public void periodic() {
         SmartDashboard.putBoolean("IR Sensor", RobotContainer.D_INTAKE_IR.supplier.getAsBoolean());
-        SmartDashboard.putNumber("intake voltage", getVoltage());
+        SmartDashboard.putNumber("intake voltage", leader.getOutputCurrent());
     }
 
     public Command IntakeCoralSubstation(){
@@ -77,6 +84,9 @@ public class NewIntakeSubsystem extends SubsystemBase {
     }
     public Command runIntake(){
         return startEnd(this::intake, this::stop).withTimeout(2);
+    }
+    public Command intakeAlgae(){
+        return startEnd(this::outTake, this::outTake).until(RobotContainer.newIntakeSubsystem.isAlgaeGripped());
     }
     public void intake()
     {

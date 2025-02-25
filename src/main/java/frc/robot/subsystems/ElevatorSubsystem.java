@@ -160,6 +160,16 @@ public class ElevatorSubsystem extends SubsystemBase {
                 () -> closedLoopController.setReference(0, ControlType.kMAXMotionPositionControl,
                         ClosedLoopSlot.kSlot1));
     }
+    public Command raiseElevatorHighAlgae() {
+        return this.runOnce(
+                () -> closedLoopController.setReference(35, ControlType.kMAXMotionPositionControl,
+                        ClosedLoopSlot.kSlot0));
+    }
+    public Command raiseElevatorLowAlgae() {
+        return this.runOnce(
+                () -> closedLoopController.setReference(25, ControlType.kMAXMotionPositionControl,
+                        ClosedLoopSlot.kSlot0));
+    }
 
     public int getTargetPosition() {
         return targetPosition;

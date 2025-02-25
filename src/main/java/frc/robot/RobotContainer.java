@@ -62,7 +62,7 @@ public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem(D_INTAKE_IR);
   public static final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
   private final HorizontalElevatorSubsystem horizontalElevatorSubsystem = new HorizontalElevatorSubsystem();
-  private final NewIntakeSubsystem newIntakeSubsystem = new NewIntakeSubsystem();
+  public static final NewIntakeSubsystem newIntakeSubsystem = new NewIntakeSubsystem();
 
   
 
