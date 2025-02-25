@@ -181,7 +181,7 @@ public static BooleanSupplier isInIntakeZone(){
     //intake
     NamedCommands.registerCommand("Intake",newIntakeSubsystem.IntakeCoralSubstation().alongWith(elevatorSubsystem.raiseElevatorIntake()).andThen(elevatorSubsystem.lowerElevator()));
     //Score
-    NamedCommands.registerCommand("Score",(new WaitCommand(1)).andThen(newIntakeSubsystem.runIntake()).andThen(new WaitCommand(1)).andThen(horizontalElevatorSubsystem.MoveHEBack().alongWith(elevatorSubsystem.lowerElevator())));
+    NamedCommands.registerCommand("Score",(new WaitCommand(0.8)).andThen(newIntakeSubsystem.runIntake()).andThen(new WaitCommand(0.2)).andThen(horizontalElevatorSubsystem.MoveHEBack().alongWith(elevatorSubsystem.lowerElevator())));
   }
 
   /**
@@ -207,7 +207,7 @@ public static BooleanSupplier isInIntakeZone(){
       { return m_driverController.getLeftTriggerAxis() > 0.5;}
       );
 
-    if(m_driverController.getYButtonPressed())
+    if(m_driverController.getLeftTriggerAxis() > 0.5)
       isInCoralMode = !isInCoralMode;
 
     if (isInCoralMode)
@@ -215,7 +215,7 @@ public static BooleanSupplier isInIntakeZone(){
         // intake
         new JoystickButton(m_driverController, XboxController.Button.kX.value)
           .onTrue(newIntakeSubsystem.IntakeCoralSubstation().alongWith(elevatorSubsystem.raiseElevatorIntake())
-          .andThen(elevatorSubsystem.lowerElevator()));
+          .andThen(elevatorSubsystem.lowerElevator()).alongWith(horizontalElevatorSubsystem.MoveHEBack()));
           // L4
         new JoystickButton(m_driverController, XboxController.Button.kY.value).and(new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value))
           .onTrue(
@@ -243,19 +243,17 @@ public static BooleanSupplier isInIntakeZone(){
         .onTrue(
           m_robotDrive.AutoAlignRight().andThen(elevatorSubsystem.raiseElevatorL2().alongWith(horizontalElevatorSubsystem.HElevatorForwardWithL2Clearance())
         ));
-        // testing
         // new JoystickButton(m_driverController, XboxController.Button.kA.value)
-        //   .onTrue(
-        //     m_robotDrive.AutoAlignRight()
-        //   );
+        //   .onTrue(m_robotDrive.AutoAlignLeft());
+        //   new JoystickButton(m_driverController, XboxController.Button.kB.value)
+        //   .onTrue(m_robotDrive.AutoAlignRight());
+        // // testing
+     
      
         // Score
       rTButton
         .onTrue(newIntakeSubsystem.runIntake())
         .onFalse(elevatorSubsystem.lowerElevator().alongWith(horizontalElevatorSubsystem.MoveHEBack()));
-
-      lTButton
-        .onTrue(newIntakeSubsystem.IntakeManual());
       
 
     // new Trigger(isInIntakeZone())

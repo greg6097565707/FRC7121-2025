@@ -440,16 +440,16 @@ public void autoAlignStop() {
     return ((getTrueHeading() + rotationValue)%180) * -0.008;
   }
   // alignment Y speed Right
-  public static final double autoAlignYoffsetRight = -.15;
+  public static final double autoAlignYoffsetRight = -.17;
   public double limelightYSpeedAlignRight()
   {
-    double kP = .25;
+    double kP = .3;
     Pose3d targetingYSpeed = LimelightHelpers.getBotPose3d_TargetSpace("limelight");
     return (targetingYSpeed.getX()+autoAlignYoffsetRight) * kP;
   }
 
   // alignment spped Y left
-  public static final double autoAlignYoffsetLeft = .18;
+  public static final double autoAlignYoffsetLeft = .17;
   public double limelightYSpeedAlignLeft()
   {
     double kP = .25;
@@ -467,7 +467,7 @@ public void autoAlignStop() {
 
   // simple proportional ranging control with Limelight's "ty" value
   // this works best if your Limelight's mount height and target mount height are different.
-  public static final double autoAlignXoffset = -5;// if your limelight and target are mounted at the same or similar heights, use "ta" (area) for target ranging rather than "ty"
+  public static final double autoAlignXoffset = -4.5;// if your limelight and target are mounted at the same or similar heights, use "ta" (area) for target ranging rather than "ty"
   public double limelightXSpeed()
   {    
     double kP = .001;

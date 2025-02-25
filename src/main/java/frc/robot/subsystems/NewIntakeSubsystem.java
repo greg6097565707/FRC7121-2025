@@ -68,7 +68,7 @@ public class NewIntakeSubsystem extends SubsystemBase {
     }
 
     public Command IntakeCoralSubstation(){
-        return startEnd(this::intake, this::stop).until(RobotContainer.D_INTAKE_IR.supplier).andThen(startEnd(this::rumbleController, this::stopRumble).withTimeout(2));
+        return startEnd(this::intake, this::stop).until(RobotContainer.D_INTAKE_IR.supplier);
     }
     public Command ScoreIntakeCoral(){
         return startEnd(this::intake, this::stop).until(() -> {
@@ -136,7 +136,7 @@ public class NewIntakeSubsystem extends SubsystemBase {
     public BooleanSupplier hasBall()
     {
         return () -> {
-            return getVoltage() > 5;
+            return getVoltage() < 11;
         };
     }
 }
