@@ -56,7 +56,7 @@ public class ElevatorSubsystem extends SubsystemBase {
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
                 // Set PID values for position control. We don't need to pass a closed
                 // loop slot, as it will default to slot 0.
-                .p(0.008)
+                .p(0.01)
                 .i(0.)
                 .d(0)
                 .outputRange(-1, 1)
@@ -70,8 +70,8 @@ public class ElevatorSubsystem extends SubsystemBase {
         leaderConfig.closedLoop.maxMotion
                 // Set MAXMotion parameters for position control. We don't need to pass
                 // a closed loop slot, as it will default to slot 0.
-                .maxVelocity(4000)
-                .maxAcceleration(25000)
+                .maxVelocity(5000)
+                .maxAcceleration(20000)
                 .allowedClosedLoopError(1)
                 // Set MAXMotion parameters for velocity control in slot 1
                 .maxAcceleration(15000, ClosedLoopSlot.kSlot1)
@@ -162,12 +162,12 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
     public Command raiseElevatorHighAlgae() {
         return this.runOnce(
-                () -> closedLoopController.setReference(35, ControlType.kMAXMotionPositionControl,
+                () -> closedLoopController.setReference(32, ControlType.kMAXMotionPositionControl,
                         ClosedLoopSlot.kSlot0));
     }
     public Command raiseElevatorLowAlgae() {
         return this.runOnce(
-                () -> closedLoopController.setReference(25, ControlType.kMAXMotionPositionControl,
+                () -> closedLoopController.setReference(20, ControlType.kMAXMotionPositionControl,
                         ClosedLoopSlot.kSlot0));
     }
 

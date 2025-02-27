@@ -23,8 +23,10 @@ import frc.robot.RobotContainer;
 public class NewIntakeSubsystem extends SubsystemBase {
     
     private SparkMax leader;
+    private int consecutive_algae = 0;
     // private SparkMax leftMotor;
     DigitalInput irSensor;
+
 
     public NewIntakeSubsystem()
     {
@@ -62,20 +64,30 @@ public class NewIntakeSubsystem extends SubsystemBase {
     }
     public BooleanSupplier isAlgaeGripped(){
         return (BooleanSupplier) () -> {
-            if (this.leader.getOutputCurrent() > 10)
-            return true;
-            else return false;
+            if (this.leader.getOutputCurrent() > 45)
+                if (this.consecutive_algae > 10)
+                    return true;
+                else {
+                    consecutive_algae += 1;
+                    return false;
+                }
+            else {
+                consecutive_algae = 0;
+                return false;
+            }
         };
     }
 
     @Override
     public void periodic() {
         SmartDashboard.putBoolean("IR Sensor", RobotContainer.D_INTAKE_IR.supplier.getAsBoolean());
-        SmartDashboard.putNumber("intake voltage", leader.getOutputCurrent());
+        SmartDashboard.putNumber("intake AMPS", leader.getOutputCurrent());
+        SmartDashboard.putBoolean("algaeIn", this.isAlgaeGripped().getAsBoolean());
     }
 
     public Command IntakeCoralSubstation(){
         return startEnd(this::intake, this::stop).until(RobotContainer.D_INTAKE_IR.supplier);
+        //.alongWith(startEnd(RobotContainer.controller::rumble, RobotContainer.controller::stopRumble))
     }
     public Command ScoreIntakeCoral(){
         return startEnd(this::intake, this::stop).until(() -> {
@@ -83,10 +95,11 @@ public class NewIntakeSubsystem extends SubsystemBase {
         });
     }
     public Command runIntake(){
-        return startEnd(this::intake, this::stop).withTimeout(2);
+        return startEnd(this::intake, this::stop).withTimeout(0.7);
     }
     public Command intakeAlgae(){
-        return startEnd(this::outTake, this::outTake).until(RobotContainer.newIntakeSubsystem.isAlgaeGripped());
+        return 
+        startEnd(this::outTake, this::outTake).until(RobotContainer.newIntakeSubsystem.isAlgaeGripped());
     }
     public void intake()
     {
@@ -119,23 +132,16 @@ public class NewIntakeSubsystem extends SubsystemBase {
         return irSensor.get();
     }
 
-    public Command rumbleController()
+
+    public void rumble()
     {
-        return run(() -> {RobotContainer.m_driverController.setRumble(RumbleType.kBothRumble, 1);}) ;
+        RobotContainer.m_driverController.setRumble(RumbleType.kBothRumble, 1);
+
     }
 
-    public Command rumble()
+    public void stopRumble()
     {
-        return run(
-            () -> {rumbleController();
-            }).withTimeout(2).andThen(stopRumble());
-    }
-
-    public Command stopRumble()
-    {
-        return run(
-            () -> {RobotContainer.m_driverController.setRumble(RumbleType.kBothRumble, 0);
-            });
+            RobotContainer.m_driverController.setRumble(RumbleType.kBothRumble, 0);
     }
 
     public double getVoltage()

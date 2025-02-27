@@ -108,13 +108,13 @@ public class HorizontalElevatorSubsystem extends SubsystemBase {
         // run(null).onlyWhile(ElevatorSubsystem.L4AchieveHorizontalElevatorClearance()).finallyDo(this::forward);
     }
     public Command MoveHEBack(){
-        return run(this::back);
+        return runOnce(this::back);
     }
     public Command HElevatorForward(){
-        return run(this::forward);
+        return runOnce(this::forward);
     }
     public Command HElevatorBackAlage(){
-        return run(this::backAlgae);
+        return runOnce(this::backAlgae);
     }
     
     
@@ -127,7 +127,7 @@ public class HorizontalElevatorSubsystem extends SubsystemBase {
     public void backAlgae()
     {
         
-            closedLoopController.setReference(35, ControlType.kMAXMotionPositionControl,
+            closedLoopController.setReference(25, ControlType.kMAXMotionPositionControl,
           ClosedLoopSlot.kSlot0);
     }
 

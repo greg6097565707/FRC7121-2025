@@ -65,6 +65,13 @@ private BooleanSupplier hasTagAndIsNotAlignedLeft() {
     return (BooleanSupplier) () -> false;
   }
 }
+private BooleanSupplier hasTagAndIsNotAlignedMiddle() {
+  if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0)!=-1 && RobotContainer.isNotAlignedMiddle().getAsBoolean()) {
+    return (BooleanSupplier) () -> false;
+  } else {
+    return (BooleanSupplier) () -> true;
+  }
+}
 
 private IntakeIR iir;
 
@@ -75,7 +82,8 @@ public Command AutoAlignLeft() {
   return run(this::autoAlignDriveLeft).onlyWhile(hasTagAndIsNotAlignedLeft()).withTimeout(1.5);
 }
 public Command AutoAlignMiddle(){
-  return run(this::autoAlignDriveMiddle).onlyWhile(RobotContainer.isNotAlignedMiddle()).withTimeout(1.5);
+  return run(this::autoAlignDriveMiddle).onlyWhile(hasTagAndIsNotAlignedMiddle()).withTimeout(1.5);
+  
 }
 public Command AutoAlignFar(){
   return run(this::autoAlignDriveFar).onlyWhile(RobotContainer.isNotAlignedFar()).withTimeout(1.5);
@@ -280,6 +288,7 @@ public void autoAlignStop() {
     SmartDashboard.putNumber("Rotation Value", (rotationValue));
     SmartDashboard.putBoolean("intakeIR", this.iir.supplier.getAsBoolean());
     SmartDashboard.putBoolean("tagandAuto", hasTagAndIsNotAlignedRight().getAsBoolean());
+    SmartDashboard.putBoolean("alignMiddle", hasTagAndIsNotAlignedMiddle().getAsBoolean());
     // in DriveSubsystem.java
     
 

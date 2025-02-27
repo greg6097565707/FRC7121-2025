@@ -26,15 +26,18 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.LimelightHelpers.PoseEstimate;
+import frc.robot.subsystems.ControllerSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.HorizontalElevatorSubsystem;
 import frc.robot.subsystems.NewIntakeSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import java.util.List;
@@ -64,6 +67,8 @@ public class RobotContainer {
   private final HorizontalElevatorSubsystem horizontalElevatorSubsystem = new HorizontalElevatorSubsystem();
   public static final NewIntakeSubsystem newIntakeSubsystem = new NewIntakeSubsystem();
 
+  public ControllerSubsystem controller = new ControllerSubsystem(this);
+
   
 
   public boolean isInCoralMode = true;
@@ -74,6 +79,9 @@ public class RobotContainer {
 
   Trigger rTButton;
   Trigger lTButton;
+
+  Trigger coralMode;
+  Trigger algaeMode;
 
 
   // robot state boolean suppliers
@@ -113,6 +121,7 @@ public static BooleanSupplier isNotAlignedFar() {
       } else return false;
   };
 }
+
 
 //led's are connected to 17
 
@@ -170,7 +179,7 @@ public static BooleanSupplier isInIntakeZone(){
                 true),
             m_robotDrive));
     //pathplannerL4commands
-    NamedCommands.registerCommand("RightL4Score", m_robotDrive.AutoAlignRight().andThen(elevatorSubsystem.raiseElevatorL4().alongWith(horizontalElevatorSubsystem.HElevatorForwardWithL4Clearance())));
+    NamedCommands.registerCommand("RightL4Score", m_robotDrive.AutoAlignRight().alongWith(elevatorSubsystem.raiseElevatorL4().alongWith(horizontalElevatorSubsystem.HElevatorForwardWithL4Clearance())));
     NamedCommands.registerCommand("LeftL4Score", m_robotDrive.AutoAlignLeft().andThen(elevatorSubsystem.raiseElevatorL4().alongWith(horizontalElevatorSubsystem.HElevatorForwardWithL4Clearance())));
     //pathplannerL3Commands
     NamedCommands.registerCommand("RightL3Score", m_robotDrive.AutoAlignRight().andThen(elevatorSubsystem.raiseElevatorL3().alongWith(horizontalElevatorSubsystem.HElevatorForwardWithL3Clearance())));
@@ -181,7 +190,7 @@ public static BooleanSupplier isInIntakeZone(){
     //intake
     NamedCommands.registerCommand("Intake",newIntakeSubsystem.IntakeCoralSubstation().alongWith(elevatorSubsystem.raiseElevatorIntake()).andThen(elevatorSubsystem.lowerElevator()));
     //Score
-    NamedCommands.registerCommand("Score",(new WaitCommand(0.8)).andThen(newIntakeSubsystem.runIntake()).andThen(new WaitCommand(0.2)).andThen(horizontalElevatorSubsystem.MoveHEBack().alongWith(elevatorSubsystem.lowerElevator())));
+    NamedCommands.registerCommand("Score",(new WaitCommand(0.8)).andThen(newIntakeSubsystem.runIntake()).andThen(horizontalElevatorSubsystem.MoveHEBack().alongWith(elevatorSubsystem.lowerElevator())));
   }
 
   /**
@@ -193,7 +202,7 @@ public static BooleanSupplier isInIntakeZone(){
    * passing it to a
    * {@link JoystickButton}.
    */
-  private void configureButtonBindings() {
+  public void configureButtonBindings() {
     // new JoystickButton(m_driverController, Button.kR1.value)
     //     .whileTrue(new RunCommand(
     //         () -> m_robotDrive.setX(),
@@ -207,67 +216,103 @@ public static BooleanSupplier isInIntakeZone(){
       { return m_driverController.getLeftTriggerAxis() > 0.5;}
       );
 
-    if(m_driverController.getLeftTriggerAxis() > 0.5)
-      isInCoralMode = !isInCoralMode;
+    // algaeMode = new Trigger(() ->
+    // {
+    //   return controller.getMode() == false;
+    // }
+    // );
 
-    if (isInCoralMode)
-    {
+    // if(m_driverController.getStartButtonPressed())
+    //   isInCoralMode = true;
+
+    // else if (m_driverController.getBackButtonPressed())
+    //   isInCoralMode = false;
+
+    // if (isInCoralMode)
+    // {
         // intake
         new JoystickButton(m_driverController, XboxController.Button.kX.value)
           .onTrue(newIntakeSubsystem.IntakeCoralSubstation().alongWith(elevatorSubsystem.raiseElevatorIntake())
           .andThen(elevatorSubsystem.lowerElevator()).alongWith(horizontalElevatorSubsystem.MoveHEBack()));
           // L4
-        new JoystickButton(m_driverController, XboxController.Button.kY.value).and(new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value))
+        new JoystickButton(m_driverController, XboxController.Button.kY.value).and(rTButton)
           .onTrue(
             m_robotDrive.AutoAlignRight().andThen(elevatorSubsystem.raiseElevatorL4().alongWith(horizontalElevatorSubsystem.HElevatorForwardWithL4Clearance())
           ));
-        new JoystickButton(m_driverController, XboxController.Button.kY.value).and(new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value))
+        new JoystickButton(m_driverController, XboxController.Button.kY.value).and(lTButton)
         .onTrue(
           m_robotDrive.AutoAlignLeft().andThen(elevatorSubsystem.raiseElevatorL4().alongWith(horizontalElevatorSubsystem.HElevatorForwardWithL4Clearance())
         ));
         // L3
-        new JoystickButton(m_driverController, XboxController.Button.kB.value).and(new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value))
+        new JoystickButton(m_driverController, XboxController.Button.kB.value).and(lTButton)
         .onTrue(
           m_robotDrive.AutoAlignLeft().andThen(elevatorSubsystem.raiseElevatorL3().alongWith(horizontalElevatorSubsystem.HElevatorForwardWithL3Clearance())
         ));
-        new JoystickButton(m_driverController, XboxController.Button.kB.value).and(new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value))
+        new JoystickButton(m_driverController, XboxController.Button.kB.value).and(rTButton)
         .onTrue(
           m_robotDrive.AutoAlignRight().andThen(elevatorSubsystem.raiseElevatorL3().alongWith(horizontalElevatorSubsystem.HElevatorForwardWithL3Clearance())
         ));
         // L2
-        new JoystickButton(m_driverController, XboxController.Button.kA.value).and(new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value))
+        new JoystickButton(m_driverController, XboxController.Button.kA.value).and(lTButton)
         .onTrue(
           m_robotDrive.AutoAlignLeft().andThen(elevatorSubsystem.raiseElevatorL2().alongWith(horizontalElevatorSubsystem.HElevatorForwardWithL2Clearance())
         ));
-        new JoystickButton(m_driverController, XboxController.Button.kA.value).and(new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value))
+        new JoystickButton(m_driverController, XboxController.Button.kA.value).and(rTButton)
         .onTrue(
           m_robotDrive.AutoAlignRight().andThen(elevatorSubsystem.raiseElevatorL2().alongWith(horizontalElevatorSubsystem.HElevatorForwardWithL2Clearance())
         ));
-        // new JoystickButton(m_driverController, XboxController.Button.kA.value)
-        //   .onTrue(m_robotDrive.AutoAlignLeft());
-        //   new JoystickButton(m_driverController, XboxController.Button.kB.value)
-        //   .onTrue(m_robotDrive.AutoAlignRight());
+        
         // // testing
-     
+        // new JoystickButton(m_driverController, XboxController.Button.kA.value)
+        //   .onTrue(m_robotDrive.AutoAlignMiddle());
+
      
         // Score
-      rTButton
+      new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
         .onTrue(newIntakeSubsystem.runIntake())
         .onFalse(elevatorSubsystem.lowerElevator().alongWith(horizontalElevatorSubsystem.MoveHEBack()));
+
+      // new JoystickButton(m_driverController, XboxController.Button.kStart.value)
+      //   .onTrue(
+      //     controller.switchToCoral()
+      //   );
       
+      // new JoystickButton(m_driverController, XboxController.Button.kBack.value)
+      //   .onTrue(
+      //     controller.switchToAlgae()
+      //   );
+
+      new POVButton(m_driverController, 0)
+        .onTrue(m_robotDrive.AutoAlignMiddle());
+        // .andThen(elevatorSubsystem.raiseElevatorHighAlgae()).andThen(new WaitCommand(1.5)).andThen(horizontalElevatorSubsystem.HElevatorForward().alongWith(newIntakeSubsystem.intakeAlgae())).andThen(horizontalElevatorSubsystem.MoveHEBack().alongWith(elevatorSubsystem.lowerElevator())));
+       
+      // new POVButton(m_driverController, 90).and(algaeMode)
+      //   .onTrue(m_robotDrive.AutoAlignMiddle().andThen(elevatorSubsystem.raiseElevatorLowAlgae()).andThen(new WaitCommand(1)).andThen(horizontalElevatorSubsystem.HElevatorForward().alongWith(newIntakeSubsystem.intakeAlgae())).andThen(horizontalElevatorSubsystem.MoveHEBack().alongWith(elevatorSubsystem.lowerElevator())));
+      
+      // new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value)
+      // //  .and(new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value))
+      // .onTrue(m_robotDrive.AutoAlignMiddle());
+      // .andThen(elevatorSubsystem.raiseElevatorHighAlgae()).andThen(new WaitCommand(1.5)).andThen(horizontalElevatorSubsystem.HElevatorForward().alongWith(newIntakeSubsystem.intakeAlgae())).andThen(horizontalElevatorSubsystem.MoveHEBack().alongWith(elevatorSubsystem.lowerElevator())));
+      new JoystickButton(m_driverController, XboxController.Button.kB.value).and(new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value))
+      .onTrue(m_robotDrive.AutoAlignMiddle().andThen(elevatorSubsystem.raiseElevatorLowAlgae()).andThen(new WaitCommand(1)).andThen(horizontalElevatorSubsystem.HElevatorForward().alongWith(newIntakeSubsystem.intakeAlgae())).andThen(horizontalElevatorSubsystem.MoveHEBack().alongWith(elevatorSubsystem.lowerElevator())));
+      new JoystickButton(m_driverController, XboxController.Button.kY.value).and(new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value))
+      .onTrue(m_robotDrive.AutoAlignMiddle().andThen(elevatorSubsystem.raiseElevatorHighAlgae()).andThen(new WaitCommand(1.5)).andThen(horizontalElevatorSubsystem.HElevatorForward().alongWith(newIntakeSubsystem.intakeAlgae())).andThen(horizontalElevatorSubsystem.MoveHEBack().alongWith(elevatorSubsystem.lowerElevator())));
+
 
     // new Trigger(isInIntakeZone())
     // .onTrue(newIntakeSubsystem.IntakeCoralSubstation().alongWith(elevatorSubsystem.raiseElevatorIntake())
     // .andThen(elevatorSubsystem.lowerElevator()));
     
-    }
-    else 
-    {
-      // new JoystickButton(m_driverController, XboxController.Button.kA.value)
-      // .onTrue(m_robotDrive.AutoAlignFar().andThen(m_robotDrive.AutoAlignMiddle()));
-      //input algae commands
+    // }
+    // else 
+    // {
+    //   // new JoystickButton(m_driverController, XboxController.Button.kA.value)
+    //   // .onTrue(m_robotDrive.AutoAlignFar().andThen(m_robotDrive.AutoAlignMiddle()));
+    //   //input algae commands
 
-    }
+      
+
+    // }
 
 
 
