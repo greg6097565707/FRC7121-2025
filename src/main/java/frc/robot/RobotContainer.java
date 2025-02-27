@@ -31,6 +31,7 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.HorizontalElevatorSubsystem;
 import frc.robot.subsystems.NewIntakeSubsystem;
+import frc.robot.subsystems.RGBSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -66,6 +67,7 @@ public class RobotContainer {
   public static final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
   private final HorizontalElevatorSubsystem horizontalElevatorSubsystem = new HorizontalElevatorSubsystem();
   public static final NewIntakeSubsystem newIntakeSubsystem = new NewIntakeSubsystem();
+  private static final RGBSubsystem RGBSubsystem = new RGBSubsystem();
 
   public ControllerSubsystem controller = new ControllerSubsystem(this);
 

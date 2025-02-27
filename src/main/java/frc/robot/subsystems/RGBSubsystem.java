@@ -1,14 +1,15 @@
 package frc.robot.subsystems;
 
-import org.w3c.dom.css.RGBColor;
+// import org.w3c.dom.css.RGBColor;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj.motorcontrol.Spark;
-import frc.robot.IntakeIR;
+// import edu.wpi.first.wpilibj.motorcontrol.Spark;
+// import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+// import frc.robot.IntakeIR;
 import frc.robot.RobotContainer;
 import frc.robot.controllers.RGBController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.RunCommand;
+// import edu.wpi.first.wpilibj2.command.RunCommand;
 
 
 
@@ -51,7 +52,13 @@ public class RGBSubsystem extends SubsystemBase {
     public Command ScoringAlgaeCommand(){
         return run(this::GrabbingAlgae);
     }
+    @Override
     public void periodic() {
-       
+        
+        if(RobotContainer.D_INTAKE_IR.supplier.getAsBoolean() || RobotContainer.newIntakeSubsystem.isAlgaeGripped().getAsBoolean())
+            this.GamePieceIN();
+        else 
+            this.GamePieceOut();
+        
     }
 }
