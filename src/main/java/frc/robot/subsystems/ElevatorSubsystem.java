@@ -133,7 +133,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public Command raiseElevatorIntake() {
         return this.runOnce(
-                () -> closedLoopController.setReference(11, ControlType.kMAXMotionPositionControl, // 50
+                () -> closedLoopController.setReference(9.5, ControlType.kMAXMotionPositionControl, // 50
                         ClosedLoopSlot.kSlot0));
     }
 
