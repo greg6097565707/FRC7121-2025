@@ -148,7 +148,7 @@ public double cosineScale(Rotation2d currentAngle, Rotation2d desiredAngle){
     m_drivingTalonFX.setControl(
       m_velocityPID
       .withVelocity(correctedDesiredState.speedMetersPerSecond)//* Math.abs(cosineScale(Rotation2d.fromRadians(m_turningEncoder.getPosition()), correctedDesiredState.angle))
-      .withEnableFOC(false)
+      .withEnableFOC(true)
     );
     // setKrakenSpeed(correctedDesiredState);
     // Command driving and turning SPARKS towards their respective setpoints.

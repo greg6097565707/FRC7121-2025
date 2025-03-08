@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.6851988636363635,
-        "y": 7.3405539772727275
+        "x": 1.3293253311258277,
+        "y": 0.5382450331125824
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.6325,
-        "y": 6.762201704545455
+        "x": 2.329325331125828,
+        "y": 0.5382450331125824
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.045624999999999,
-        "y": 5.28640625
+        "x": 3.8136382450331126,
+        "y": 2.572185430463577
       },
       "prevControl": {
-        "x": 5.7336647727272725,
-        "y": 6.60265625
+        "x": 3.494019039735099,
+        "y": 1.6714403973509935
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -122.00538320808352
+    "rotation": 56.309932474020215
   },
   "reversed": false,
-  "folder": "farside3coral",
+  "folder": "New Folder",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -52.733598099022835
+    "rotation": 47.38594403038877
   },
   "useDefaultConstraints": true
 }

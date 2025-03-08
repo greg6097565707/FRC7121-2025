@@ -109,7 +109,7 @@ public final class Constants {
     public static final double kTurningMaxOutput = 1;
 
     public static final NeutralModeValue kDrivingMotorIdleMode = NeutralModeValue.Brake;
-    public static final IdleMode kTurningMotorIdleMode = IdleMode.kBrake;
+//[[[= ===[[]]    public static final IdleMode kTurningMotorIdleMode = IdleMode.kBrake;
 
     public static final int kDrivingMotorCurrentLimit = 36; // amps
     public static final int kTurningMotorCurrentLimit = 20; // amps
@@ -117,6 +117,7 @@ public final class Constants {
 
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
+    public static final int kSecondDriverControllerPort = 1;
     public static final double kDriveDeadband = 0.15;
     public static final double driveSensitivity = .5; // 0.0 - 1.0
   }

@@ -96,25 +96,40 @@ public class HorizontalElevatorSubsystem extends SubsystemBase {
         */
         leader.configure(leaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
-    public Command HElevatorForwardWithL4Clearance(){
-        return run(this::back).onlyWhile(RobotContainer.elevatorSubsystem.L4AchieveHorizontalElevatorClearance()).finallyDo(this::forward);
-    }
-    public Command HElevatorForwardWithL3Clearance(){
-        return run(this::back).onlyWhile(RobotContainer.elevatorSubsystem.L3AchieveHorizontalElevatorClearance()).finallyDo(this::forward);
-        // run(null).onlyWhile(ElevatorSubsystem.L4AchieveHorizontalElevatorClearance()).finallyDo(this::forward);
-    }
-    public Command HElevatorForwardWithL2Clearance(){
-        return run(this::back).onlyWhile(RobotContainer.elevatorSubsystem.L2AchieveHorizontalElevatorClearance()).finallyDo(this::forward);
-        // run(null).onlyWhile(ElevatorSubsystem.L4AchieveHorizontalElevatorClearance()).finallyDo(this::forward);
-    }
+    // public Command HElevatorForwardWithL4Clearance(){
+    //     return run(this::back).onlyWhile(RobotContainer.elevatorSubsystem.L4AchieveHorizontalElevatorClearance()).finallyDo(this::forward);
+    // }
+    // public Command HElevatorForwardWithL3Clearance(){
+    //     return run(this::back).onlyWhile(RobotContainer.elevatorSubsystem.L3AchieveHorizontalElevatorClearance()).finallyDo(this::forward);
+    //     // run(null).onlyWhile(ElevatorSubsystem.L4AchieveHorizontalElevatorClearance()).finallyDo(this::forward);
+    // }
+    // public Command HElevatorForwardWithL2Clearance(){
+    //     return run(this::back).onlyWhile(RobotContainer.elevatorSubsystem.L2AchieveHorizontalElevatorClearance()).finallyDo(this::forward);
+    //     // run(null).onlyWhile(ElevatorSubsystem.L4AchieveHorizontalElevatorClearance()).finallyDo(this::forward);
+    // }
     public Command MoveHEBack(){
         return runOnce(this::back);
     }
     public Command HElevatorForward(){
         return runOnce(this::forward);
     }
+
+    public Command processerReach() {
+        return runOnce(this::processer);
+    }
+
+
     public Command HElevatorBackAlage(){
         return runOnce(this::backAlgae);
+    }
+
+
+
+    public void processer()
+    {
+        
+            closedLoopController.setReference(25, ControlType.kMAXMotionPositionControl,
+          ClosedLoopSlot.kSlot0);
     }
     
     

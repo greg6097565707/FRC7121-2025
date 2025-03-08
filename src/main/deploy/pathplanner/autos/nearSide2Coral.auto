@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "toReef"
+            "pathName": "neartoreef"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "RightL4Score"
+            "name": "LeftL4Score"
           }
         },
         {
@@ -29,7 +29,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "to coral"
+                  "pathName": "neartozone"
                 }
               },
               {
@@ -57,13 +57,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "backtoreef"
+            "pathName": "nearzonetoreef"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "LeftL4Score"
+            "name": "RightL4Score"
           }
         },
         {

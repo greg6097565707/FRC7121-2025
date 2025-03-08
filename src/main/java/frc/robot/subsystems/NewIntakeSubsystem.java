@@ -31,7 +31,7 @@ public class NewIntakeSubsystem extends SubsystemBase {
     public NewIntakeSubsystem()
     {
         leader = new SparkMax(Constants.IntakeConstants.rightMotorID , MotorType.kBrushless);
-        // irSensor = new DigitalInput(0);
+        //irSensor = new DigitalInput(0);
 
         SparkMaxConfig globalConfig = new SparkMaxConfig();
         SparkMaxConfig leaderConfig = new SparkMaxConfig();

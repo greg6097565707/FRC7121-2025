@@ -76,18 +76,23 @@ private BooleanSupplier hasTagAndIsNotAlignedMiddle() {
 private IntakeIR iir;
 
 public Command AutoAlignRight() {
-  return run(this::autoAlignDriveRight).onlyWhile(hasTagAndIsNotAlignedRight()).withTimeout(1.5).finallyDo(this::autoAlignStop);
+  return run(this::autoAlignDriveRight).onlyWhile(hasTagAndIsNotAlignedRight()).withTimeout(2).finallyDo(this::autoAlignStop);
 }
 public Command AutoAlignLeft() {
-  return run(this::autoAlignDriveLeft).onlyWhile(hasTagAndIsNotAlignedLeft()).withTimeout(1.5);
+  return run(this::autoAlignDriveLeft).onlyWhile(hasTagAndIsNotAlignedLeft()).withTimeout(2).finallyDo(this::autoAlignStop);
 }
 public Command AutoAlignMiddle(){
-  return run(this::autoAlignDriveMiddle).onlyWhile(hasTagAndIsNotAlignedMiddle()).withTimeout(1.5);
+  return run(this::autoAlignDriveMiddle).onlyWhile(hasTagAndIsNotAlignedMiddle()).withTimeout(2).finallyDo(this::autoAlignStop);
   
 }
 public Command AutoAlignFar(){
   return run(this::autoAlignDriveFar).onlyWhile(RobotContainer.isNotAlignedFar()).withTimeout(1.5);
 }
+
+// public Command autoAlignStop() {
+//   return run(this::autoAlignStop);
+// }
+
 public void autoAlignDriveRight() {
   this.drive(limelightXSpeed(), 
   limelightYSpeedAlignRight(), 
@@ -246,11 +251,11 @@ public void autoAlignStop() {
     }
     else if (TAGID == 8 || TAGID == 17)
     {
-      rotationValue = 60;
+      rotationValue = -60;
     }
     else if (TAGID == 9 || TAGID == 22)
     {
-      rotationValue = 120;
+      rotationValue = -120;
     }
     else if (TAGID == 10 || TAGID == 21)
     {
@@ -262,7 +267,7 @@ public void autoAlignStop() {
     }
     else if (TAGID == 6 || TAGID == 19)
     {
-      rotationValue = -60;
+      rotationValue = 0;//60
     }
   }
   
@@ -458,7 +463,7 @@ public void autoAlignStop() {
   }
 
   // alignment spped Y left
-  public static final double autoAlignYoffsetLeft = .17;
+  public static final double autoAlignYoffsetLeft = .22;
   public double limelightYSpeedAlignLeft()
   {
     double kP = .25;
