@@ -29,7 +29,7 @@ import frc.robot.LimelightHelpers.PoseEstimate;
 import frc.robot.subsystems.ControllerSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
-import frc.robot.subsystems.HorizontalElevatorSubsystem;
+
 import frc.robot.subsystems.NewIntakeSubsystem;
 import frc.robot.subsystems.RGBSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -65,7 +65,6 @@ public class RobotContainer {
   public static final IntakeIR D_INTAKE_IR = new IntakeIR(0);
   private final DriveSubsystem m_robotDrive = new DriveSubsystem(D_INTAKE_IR);
   public static final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
-  private final HorizontalElevatorSubsystem horizontalElevatorSubsystem = new HorizontalElevatorSubsystem();
   public static final NewIntakeSubsystem newIntakeSubsystem = new NewIntakeSubsystem();
   private static final RGBSubsystem colorSubsystem = new RGBSubsystem();
 
@@ -92,42 +91,66 @@ public class RobotContainer {
 
 
   // robot state boolean suppliers
-public static BooleanSupplier isNotAlignedRight() {
+  //old autoalign boolenas
+public static BooleanSupplier isAlignedRight() {
     Pose3d targetingYSpeed = LimelightHelpers.getBotPose3d_TargetSpace("limelight");
     return (BooleanSupplier) () -> {
-        if (Math.abs(targetingYSpeed.getX()+DriveSubsystem.autoAlignYoffsetRight) > 0.04
-        &&  (Math.abs(LimelightHelpers.getTY("limelight")+DriveSubsystem.autoAlignXoffset)) > 0.3 ) {
+      SmartDashboard.putNumber("y",(targetingYSpeed.getX()));
+      SmartDashboard.putNumber("x",(targetingYSpeed.getZ()));
+        if (
+        ((targetingYSpeed.getX()> 0.02) && (targetingYSpeed.getX() < 0.048)) 
+        && (Math.abs(targetingYSpeed.getZ()) < 0.6 )) {
             return true;
         } else return false;
     };
 }
-public static BooleanSupplier isNotAlignedLeft() {
+public static BooleanSupplier isAlignedLeft() {
   Pose3d targetingYSpeed = LimelightHelpers.getBotPose3d_TargetSpace("limelight");
   return (BooleanSupplier) () -> {
-      if (Math.abs(targetingYSpeed.getX()+DriveSubsystem.autoAlignYoffsetLeft) > 0.04
-      &&  (Math.abs(LimelightHelpers.getTY("limelight")+DriveSubsystem.autoAlignXoffset)) > 0.3 ) {
+    if (
+      ((targetingYSpeed.getX()> -.32) && (targetingYSpeed.getX() < -.27)) 
+      && (Math.abs(targetingYSpeed.getZ()) < 0.6 )) {
           return true;
       } else return false;
   };
 }
-public static BooleanSupplier isNotAlignedMiddle() {
+public static BooleanSupplier isAlignedMiddle() {
   Pose3d targetingYSpeed = LimelightHelpers.getBotPose3d_TargetSpace("limelight");
   return (BooleanSupplier) () -> {
-      if (Math.abs(targetingYSpeed.getX()) > 0.04
-      &&  (Math.abs(LimelightHelpers.getTY("limelight")+DriveSubsystem.autoAlignXoffset)) > 0.3 ) {
+    if (
+      ((targetingYSpeed.getX()> -.15) && (targetingYSpeed.getX() < -.1)) 
+      && (Math.abs(targetingYSpeed.getZ()) < 0.6 )) {
           return true;
       } else return false;
   };
 }
-public static BooleanSupplier isNotAlignedFar() {
-  Pose3d targetingYSpeed = LimelightHelpers.getBotPose3d_TargetSpace("limelight");
-  return (BooleanSupplier) () -> {
-      if (Math.abs(targetingYSpeed.getX()) > 0.04
-      &&  (Math.abs(LimelightHelpers.getTY("limelight")+DriveSubsystem.autoAlignXoffsetFar)) > 0.3 ) {
-          return true;
-      } else return false;
-  };
-}
+// public static BooleanSupplier isNotAlignedLeft() {
+//   Pose3d targetingYSpeed = LimelightHelpers.getBotPose3d_TargetSpace("limelight");
+//   return (BooleanSupplier) () -> {
+//       if (Math.abs(targetingYSpeed.getX()+DriveSubsystem.autoAlignYoffsetLeft) > 0.04
+//       &&  (Math.abs(LimelightHelpers.getTY("limelight")+DriveSubsystem.autoAlignXoffset)) > 0.3 ) {
+//           return true;
+//       } else return false;
+//   };
+// }
+// public static BooleanSupplier isNotAlignedMiddle() {
+//   Pose3d targetingYSpeed = LimelightHelpers.getBotPose3d_TargetSpace("limelight");
+//   return (BooleanSupplier) () -> {
+//       if (Math.abs(targetingYSpeed.getX()) > 0.04
+//       &&  (Math.abs(LimelightHelpers.getTY("limelight")+DriveSubsystem.autoAlignXoffset)) > 0.3 ) {
+//           return true;
+//       } else return false;
+//   };
+// }
+// public static BooleanSupplier isNotAlignedFar() {
+//   Pose3d targetingYSpeed = LimelightHelpers.getBotPose3d_TargetSpace("limelight");
+//   return (BooleanSupplier) () -> {
+//       if (Math.abs(targetingYSpeed.getX()) > 0.04
+//       &&  (Math.abs(LimelightHelpers.getTY("limelight")+DriveSubsystem.autoAlignXoffsetFar)) > 0.3 ) {
+//           return true;
+//       } else return false;
+//   };
+// }
 
 
 //led's are connected to 17
@@ -289,6 +312,15 @@ public static BooleanSupplier isInIntakeZone(){
       new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value)
         .onTrue(controller.switchMode()
         .andThen(controller.rumble(.5)).andThen(new WaitCommand(.2).andThen(controller.stopRumble())));
+
+        new JoystickButton(m_driverController, XboxController.Button.kA.value)
+        .onTrue(newIntakeSubsystem.IntakeCoralSubstation());
+        new JoystickButton(m_driverController, XboxController.Button.kX.value)
+        .onTrue(newIntakeSubsystem.intakeAlgae());
+        new JoystickButton(m_driverController, XboxController.Button.kY.value)
+        .onTrue(newIntakeSubsystem.runIntake());
+        new JoystickButton(m_driverController, XboxController.Button.kB.value)
+        .onTrue(m_robotDrive.AutoAlignMiddle());
 
 
 

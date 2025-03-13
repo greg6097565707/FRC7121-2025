@@ -64,7 +64,7 @@ public class NewIntakeSubsystem extends SubsystemBase {
     }
     public BooleanSupplier isAlgaeGripped(){
         return (BooleanSupplier) () -> {
-            if (this.leader.getOutputCurrent() > 45)
+            if (this.leader.getOutputCurrent() > 12)
                 if (this.consecutive_algae > 10)
                     return true;
                 else {
@@ -95,15 +95,23 @@ public class NewIntakeSubsystem extends SubsystemBase {
         });
     }
     public Command runIntake(){
-        return startEnd(this::intake, this::stop).withTimeout(0.7);
+        return startEnd(this::intakeFast, this::stop).withTimeout(0.7);
+    }
+    public Command ContinousRunIntake(){
+        return run(this::intake);
     }
     public Command intakeAlgae(){
         return 
-        startEnd(this::outTake, this::outTake).until(RobotContainer.newIntakeSubsystem.isAlgaeGripped());
+        startEnd(this::intake, this::stop).until(RobotContainer.newIntakeSubsystem.isAlgaeGripped());
     }
     public void intake()
     {
-        leader.set(0.5);
+        leader.set(0.25);
+    }
+
+    public void intakeFast()
+    {
+        leader.set(0.9);
     }
 
     public void outTake()

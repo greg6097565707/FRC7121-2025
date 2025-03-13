@@ -49,67 +49,73 @@ import com.studica.frc.AHRS.BoardAxis;
 
 
 
+
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
-private BooleanSupplier hasTagAndIsNotAlignedRight() {
-  if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0)!=-1 && RobotContainer.isNotAlignedRight().getAsBoolean()) {
-    return (BooleanSupplier) () -> true;
-  } else {
-    return (BooleanSupplier) () -> false;
-  }
-}
-private BooleanSupplier hasTagAndIsNotAlignedLeft() {
-  if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0)!=-1 && RobotContainer.isNotAlignedLeft().getAsBoolean()) {
-    return (BooleanSupplier) () -> true;
-  } else {
-    return (BooleanSupplier) () -> false;
-  }
-}
-private BooleanSupplier hasTagAndIsNotAlignedMiddle() {
-  if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0)!=-1 && RobotContainer.isNotAlignedMiddle().getAsBoolean()) {
-    return (BooleanSupplier) () -> false;
-  } else {
-    return (BooleanSupplier) () -> true;
-  }
-}
+ 
+// private BooleanSupplier hasTagAndIsNotAlignedRight() {
+//   if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0)!=-1 && RobotContainer.isNotAlignedRight().getAsBoolean()) {
+//     return (BooleanSupplier) () -> true;
+//   } else {
+//     return (BooleanSupplier) () -> false;
+//   }
+// }
+// private BooleanSupplier hasTagAndIsNotAlignedLeft() {
+//   if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0)!=-1 && RobotContainer.isNotAlignedLeft().getAsBoolean()) {
+//     return (BooleanSupplier) () -> true;
+//   } else {
+//     return (BooleanSupplier) () -> false;
+//   }
+// }
+// private BooleanSupplier hasTagAndIsNotAlignedMiddle() {
+//   if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0)!=-1 && RobotContainer.isNotAlignedMiddle().getAsBoolean()) {
+//     return (BooleanSupplier) () -> false;
+//   } else {
+//     return (BooleanSupplier) () -> true;
+//   }
+// }
 
 private IntakeIR iir;
 
+private void announcedone() {
+  SmartDashboard.putBoolean("DoneAligning", true);
+}
+
 public Command AutoAlignRight() {
-  return run(this::autoAlignDriveRight).onlyWhile(hasTagAndIsNotAlignedRight()).withTimeout(2).finallyDo(this::autoAlignStop);
+  return run(this::autoAlignDriveRight).until(()->RobotContainer.isAlignedRight().getAsBoolean());
 }
 public Command AutoAlignLeft() {
-  return run(this::autoAlignDriveLeft).onlyWhile(hasTagAndIsNotAlignedLeft()).withTimeout(2).finallyDo(this::autoAlignStop);
+  return run(this::autoAlignDriveLeft).until(()->RobotContainer.isAlignedLeft().getAsBoolean());
 }
 public Command AutoAlignMiddle(){
-  return run(this::autoAlignDriveMiddle).onlyWhile(hasTagAndIsNotAlignedMiddle()).withTimeout(2).finallyDo(this::autoAlignStop);
+  return run(this::autoAlignDriveMiddle).until(()->RobotContainer.isAlignedMiddle().getAsBoolean());
   
 }
-public Command AutoAlignFar(){
-  return run(this::autoAlignDriveFar).onlyWhile(RobotContainer.isNotAlignedFar()).withTimeout(1.5);
-}
+//.onlyWhile(hasTagAndIsNotAlignedMiddle()).withTimeout(2).finallyDo(this::autoAlignStop);
+
+
 
 // public Command autoAlignStop() {
 //   return run(this::autoAlignStop);
 // }
 
 public void autoAlignDriveRight() {
-  this.drive(limelightXSpeed(), 
+  this.drive(limelightXSpeedAlign(), 
   limelightYSpeedAlignRight(), 
   limelightRotateToTarget(), 
   false);
 }
 public void autoAlignDriveLeft() {
-  this.drive(limelightXSpeed(), 
+  this.drive(limelightXSpeedAlign(), 
   limelightYSpeedAlignLeft(), 
-  limelightRotateToTarget(), 
+  0, 
   false);
 }
 
 public void autoAlignDriveMiddle() {
-  this.drive(limelightXSpeed(), 
+  this.drive(limelightXSpeedAlign(), 
   limelightYSpeedAlignmiddle(), 
-  limelightRotateToTarget(), 
+  0, 
   false);
 }
 
@@ -263,7 +269,7 @@ public void autoAlignStop() {
     }
     else if (TAGID == 11 || TAGID == 20)
     {
-      rotationValue = 120;
+      rotationValue = 0;
     }
     else if (TAGID == 6 || TAGID == 19)
     {
@@ -286,14 +292,18 @@ public void autoAlignStop() {
         });
 
     // SmartDashboard.putNumber("x speed", limelightYSpeedAlignRight());
-    SmartDashboard.putBoolean("isNotAligned", RobotContainer.isNotAlignedRight().getAsBoolean());
     SmartDashboard.putNumber("TagId", NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0));
     SmartDashboard.putString("pose", getPose().toString());
     SmartDashboard.putNumber("True Heading", this.getTrueHeading());
     SmartDashboard.putNumber("Rotation Value", (rotationValue));
     SmartDashboard.putBoolean("intakeIR", this.iir.supplier.getAsBoolean());
-    SmartDashboard.putBoolean("tagandAuto", hasTagAndIsNotAlignedRight().getAsBoolean());
-    SmartDashboard.putBoolean("alignMiddle", hasTagAndIsNotAlignedMiddle().getAsBoolean());
+    SmartDashboard.putNumber("xspeed",limelightYSpeedAlignmiddle());
+    SmartDashboard.putNumber("yspeed",limelightXSpeedAlign());
+    SmartDashboard.putBoolean("alignRight", RobotContainer.isAlignedRight().getAsBoolean());
+    SmartDashboard.putBoolean("alignLeft", RobotContainer.isAlignedLeft().getAsBoolean());
+    SmartDashboard.putBoolean("alignMiddle", RobotContainer.isAlignedMiddle().getAsBoolean());
+   
+    
     // in DriveSubsystem.java
     
 
@@ -454,42 +464,52 @@ public void autoAlignStop() {
     return ((getTrueHeading() + rotationValue)%180) * -0.008;
   }
   // alignment Y speed Right
-  public static final double autoAlignYoffsetRight = -.17;
-  public double limelightYSpeedAlignRight()
+  public static final double autoAlignYoffsetRight = -0.03;
+  public static double limelightYSpeedAlignRight()
   {
-    double kP = .3;
+    double kP = -.3;
     Pose3d targetingYSpeed = LimelightHelpers.getBotPose3d_TargetSpace("limelight");
     return (targetingYSpeed.getX()+autoAlignYoffsetRight) * kP;
   }
 
   // alignment spped Y left
-  public static final double autoAlignYoffsetLeft = .22;
-  public double limelightYSpeedAlignLeft()
+  public static final double autoAlignYoffsetLeft = .29;
+  public static double limelightYSpeedAlignLeft()
   {
-    double kP = .25;
+    double kP = -.3;
     Pose3d targetingYSpeed = LimelightHelpers.getBotPose3d_TargetSpace("limelight");
     return (targetingYSpeed.getX()+autoAlignYoffsetLeft) * kP;
   }
-  public double limelightYSpeedAlignmiddle()
+  //align middle
+  public static final double autoAlignYoffsetMiddle = .11;
+  public static double limelightYSpeedAlignmiddle()
   {
-    double kP = .25;
+    double kP = -0.3;
     Pose3d targetingYSpeed = LimelightHelpers.getBotPose3d_TargetSpace("limelight");
-    return (targetingYSpeed.getX()) * kP;
+    return (targetingYSpeed.getX()+autoAlignYoffsetMiddle) * kP;
+  }
+  //xalign
+  public static final double autoAlignXoffset = .59;
+  public static double limelightXSpeedAlign()
+  {
+    double kP = .3;
+    Pose3d targetingYSpeed = LimelightHelpers.getBotPose3d_TargetSpace("limelight");
+    return (targetingYSpeed.getZ()+autoAlignXoffset) * kP;
   }
 
 
 
   // simple proportional ranging control with Limelight's "ty" value
   // this works best if your Limelight's mount height and target mount height are different.
-  public static final double autoAlignXoffset = -4.5;// if your limelight and target are mounted at the same or similar heights, use "ta" (area) for target ranging rather than "ty"
-  public double limelightXSpeed()
-  {    
-    double kP = .001;
-    double targetingForwardSpeed = (LimelightHelpers.getTY("limelight")+autoAlignXoffset) * kP;
-    targetingForwardSpeed *= DriveConstants.kMaxSpeedMetersPerSecond;
-    targetingForwardSpeed *= -1.0;
-    return targetingForwardSpeed;
-  }
+  // public static final double autoAlignXoffset = -4.5;// if your limelight and target are mounted at the same or similar heights, use "ta" (area) for target ranging rather than "ty"
+  // public double limelightXSpeed()
+  // {    
+  //   double kP = .001;
+  //   double targetingForwardSpeed = (LimelightHelpers.getTY("limelight")+autoAlignXoffset) * kP;
+  //   targetingForwardSpeed *= DriveConstants.kMaxSpeedMetersPerSecond;
+  //   targetingForwardSpeed *= -1.0;
+  //   return targetingForwardSpeed;
+  // }
 
   public static final double autoAlignXoffsetFar = 0;// if your limelight and target are mounted at the same or similar heights, use "ta" (area) for target ranging rather than "ty"
   public double limelightXSpeedFar()

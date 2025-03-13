@@ -17,6 +17,8 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 import java.util.function.BooleanSupplier;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
@@ -57,7 +59,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         slot0Configs.kV = 0.001; 
         slot0Configs.kA = 0;
         slot0Configs.kG = 0.5; 
-        slot0Configs.kP = 1;
+        slot0Configs.kP = 1.2;
         slot0Configs.kI = 0; 
         slot0Configs.kD = 0;
 
@@ -68,6 +70,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         motionMagicConfigs.MotionMagicCruiseVelocity = 100;
         motionMagicConfigs.MotionMagicExpo_kV = 0.12; // kV is around 0.12 V/rps
         motionMagicConfigs.MotionMagicExpo_kA = 0; // Use a slower kA of 0.1 V/(rps/s)
+        
 
         leader.getConfigurator().apply(talonFXConfigs);
 
@@ -76,76 +79,19 @@ public class ElevatorSubsystem extends SubsystemBase {
         // set target position to 100 rotations
         
         follower.setControl(new Follower(leader.getDeviceID(), true));
+        
+        
 
-        // closedLoopController = leader.getClosedLoopController();
-        // encoder = leader.getEncoder();
+        
+    }
+    public void resetEncoderElevator() {
+        leader.setPosition(0);
+      }
 
-        // SparkMaxConfig globalConfig = new SparkMaxConfig();
-        // SparkMaxConfig leaderConfig = new SparkMaxConfig();
-        // SparkMaxConfig followerConfig = new SparkMaxConfig();
-
-        // // leaderConfig.encoder.setPositionConversionFactor(1);
-        // leaderConfig.encoder.positionConversionFactor(1);
-
-        // /*
-        //  * Configure the closed loop controller. We want to make sure we set the
-        //  * feedback sensor as the primary encoder.
-        //  */
-        // leaderConfig.closedLoop
-        //         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-        //         // Set PID values for position control. We don't need to pass a closed
-        //         // loop slot, as it will default to slot 0.
-        //         .p(0.01)
-        //         .i(0.)
-        //         .d(0)
-        //         .outputRange(-1, 1)
-        //         // Set PID values for velocity control in slot 1
-        //         .p(0.01, ClosedLoopSlot.kSlot1)
-        //         .i(0, ClosedLoopSlot.kSlot1)
-        //         .d(0, ClosedLoopSlot.kSlot1)
-        //         // .velocityFF(1.0 / 5767, ClosedLoopSlot.kSlot1)
-        //         .outputRange(-1, 1, ClosedLoopSlot.kSlot1);
-
-        // leaderConfig.closedLoop.maxMotion
-        //         // Set MAXMotion parameters for position control. We don't need to pass
-        //         // a closed loop slot, as it will default to slot 0.
-        //         .maxVelocity(5000)
-        //         .maxAcceleration(20000)
-        //         .allowedClosedLoopError(1)
-        //         // Set MAXMotion parameters for velocity control in slot 1
-        //         .maxAcceleration(15000, ClosedLoopSlot.kSlot1)
-        //         .maxVelocity(10000, ClosedLoopSlot.kSlot1)
-        //         .allowedClosedLoopError(1, ClosedLoopSlot.kSlot1);
-
-        // /*
-        //  * Set parameters that will apply to all SPARKs. We will also use this as
-        //  * the left leader config.
-        //  */
-        // globalConfig
-        //         .smartCurrentLimit(50)
-        //         .idleMode(IdleMode.kBrake);
-
-        // // Apply the global config and invert since it is on the opposite side
-        // leaderConfig
-        //         .apply(globalConfig);
-
-        // // Apply the global config and set the leader SPARK for follower mode
-        // followerConfig
-        //         .apply(globalConfig)
-        //         .follow(leader, true);
-
-        // /*
-        //  * Apply the configuration to the SPARKs.
-        //  *
-        //  * kResetSafeParameters is used to get the SPARK MAX to a known state. This
-        //  * is useful in case the SPARK MAX is replaced.
-        //  *
-        //  * kPersistParameters is used to ensure the configuration is not lost when
-        //  * the SPARK MAX loses power. This is useful for power cycles that may occur
-        //  * mid-operation.
-        //  */
-        // leader.configure(leaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        // follower.configure(followerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    public BooleanSupplier isAtTarget(){
+        return (BooleanSupplier) () -> { return this.leader.getPosition().getValueAsDouble() < 40;
+        };
+         
     }
 
     // public Command RasiseWhileAligning(){
@@ -176,14 +122,14 @@ public class ElevatorSubsystem extends SubsystemBase {
     public Command tempRaiseElevator()
     {
         return this.runOnce(
-            () -> leader.setControl(m_request.withPosition(-18))
+            () -> leader.setControl(m_request.withPosition(12))
         );
     }
 
     public Command tempLowerElevator()
     {
         return this.runOnce(
-            () -> leader.setControl(m_request.withPosition(-1))
+            () -> leader.setControl(m_request.withPosition(5))
         );
     }
 
@@ -234,6 +180,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putNumber("elevator encoder", leader.getPosition().getValueAsDouble());
+
+        // Logger.getInstance().recordOutput("Elevator", leader.getPosition().getValueAsDouble());
 
     }
 }
