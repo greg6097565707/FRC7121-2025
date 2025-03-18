@@ -53,13 +53,13 @@ import com.studica.frc.AHRS.BoardAxis;
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
  
-// private BooleanSupplier hasTagAndIsNotAlignedRight() {
-//   if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0)!=-1 && RobotContainer.isNotAlignedRight().getAsBoolean()) {
-//     return (BooleanSupplier) () -> true;
-//   } else {
-//     return (BooleanSupplier) () -> false;
-//   }
-// }
+private BooleanSupplier hasTag() {
+  if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0) != -1) {
+    return () -> true;
+  } else {
+    return () -> false;
+  }
+}
 // private BooleanSupplier hasTagAndIsNotAlignedLeft() {
 //   if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0)!=-1 && RobotContainer.isNotAlignedLeft().getAsBoolean()) {
 //     return (BooleanSupplier) () -> true;
@@ -82,13 +82,13 @@ private void announcedone() {
 }
 
 public Command AutoAlignRight() {
-  return run(this::autoAlignDriveRight).until(()->RobotContainer.isAlignedRight().getAsBoolean());
+  return run(this::autoAlignDriveRight).until(()->RobotContainer.isAlignedRight().getAsBoolean()).onlyWhile(hasTag());
 }
 public Command AutoAlignLeft() {
-  return run(this::autoAlignDriveLeft).until(()->RobotContainer.isAlignedLeft().getAsBoolean());
+  return run(this::autoAlignDriveLeft).until(()->RobotContainer.isAlignedLeft().getAsBoolean()).onlyWhile(hasTag());
 }
 public Command AutoAlignMiddle(){
-  return run(this::autoAlignDriveMiddle).until(()->RobotContainer.isAlignedMiddle().getAsBoolean());
+  return run(this::autoAlignDriveMiddle).until(()->RobotContainer.isAlignedMiddle().getAsBoolean()).onlyWhile(hasTag());
   
 }
 //.onlyWhile(hasTagAndIsNotAlignedMiddle()).withTimeout(2).finallyDo(this::autoAlignStop);
@@ -248,6 +248,9 @@ public void autoAlignStop() {
 
 
   }
+
+  
+
   private double rotationValue;
   private void updateRotationValue(){
    double TAGID = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0); 
@@ -302,6 +305,9 @@ public void autoAlignStop() {
     SmartDashboard.putBoolean("alignRight", RobotContainer.isAlignedRight().getAsBoolean());
     SmartDashboard.putBoolean("alignLeft", RobotContainer.isAlignedLeft().getAsBoolean());
     SmartDashboard.putBoolean("alignMiddle", RobotContainer.isAlignedMiddle().getAsBoolean());
+    SmartDashboard.putNumber("rotorSpeed", talonFrontLeft.getRotorVelocity().getValueAsDouble());
+    SmartDashboard.putBoolean("isClose", isCloseEnough().getAsBoolean());
+
    
     
     // in DriveSubsystem.java
@@ -461,8 +467,13 @@ public void autoAlignStop() {
     // // this is a hand-tuned number that determines the aggressiveness of our proportional control loop
     // // if it is too high, the robot will oscillate around.
     // // if it is too low, the robot will never reach its targget
-    return ((getTrueHeading() + rotationValue)%180) * -0.008;
+    SmartDashboard.putNumber("rotation", getTrueHeading());
+
+    return ((getTrueHeading() + rotationValue)%180) * (-0.003);
+
+    // return ((((getTrueHeading() - rotationValue) + 180) % 360 + 360) % 360 - 180) * 0.008;
   }
+
   // alignment Y speed Right
   public static final double autoAlignYoffsetRight = -0.03;
   public static double limelightYSpeedAlignRight()
@@ -495,6 +506,15 @@ public void autoAlignStop() {
     double kP = .3;
     Pose3d targetingYSpeed = LimelightHelpers.getBotPose3d_TargetSpace("limelight");
     return (targetingYSpeed.getZ()+autoAlignXoffset) * kP;
+  }
+
+  public static BooleanSupplier isCloseEnough()
+  {
+    Pose3d targetingYSpeed = LimelightHelpers.getBotPose3d_TargetSpace("limelight");
+
+    return () -> {
+      return targetingYSpeed.getZ() >= -0.9;
+    };
   }
 
 

@@ -24,6 +24,7 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -52,6 +53,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         // in init function
         talonFXConfigs = new TalonFXConfiguration();
+        talonFXConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
         // set slot 0 gains
         var slot0Configs = talonFXConfigs.Slot0;
@@ -59,17 +61,20 @@ public class ElevatorSubsystem extends SubsystemBase {
         slot0Configs.kV = 0.001; 
         slot0Configs.kA = 0;
         slot0Configs.kG = 0.5; 
-        slot0Configs.kP = 1.2;
+        slot0Configs.kP = 7;
         slot0Configs.kI = 0; 
-        slot0Configs.kD = 0;
+        slot0Configs.kD = 0.001;
+       
 
         // set Motion Magic Velocity settings
         var motionMagicConfigs = talonFXConfigs.MotionMagic;
-        motionMagicConfigs.MotionMagicAcceleration = 100; // Target acceleration of 100 rps/s
-        motionMagicConfigs.MotionMagicJerk = 100; // Target jerk of 100 rps/s/s
-        motionMagicConfigs.MotionMagicCruiseVelocity = 100;
+        motionMagicConfigs.MotionMagicAcceleration = 70; // Target acceleration of 100 rps/s
+        motionMagicConfigs.MotionMagicJerk = 600; // Target jerk of 100 rps/s/s
+        motionMagicConfigs.MotionMagicCruiseVelocity = 45;
         motionMagicConfigs.MotionMagicExpo_kV = 0.12; // kV is around 0.12 V/rps
-        motionMagicConfigs.MotionMagicExpo_kA = 0; // Use a slower kA of 0.1 V/(rps/s)
+        motionMagicConfigs.MotionMagicExpo_kA = 0.1;
+        
+         // Use a slower kA of 0.1 V/(rps/s)
         
 
         leader.getConfigurator().apply(talonFXConfigs);
@@ -89,9 +94,20 @@ public class ElevatorSubsystem extends SubsystemBase {
       }
 
     public BooleanSupplier isAtTarget(){
-        return (BooleanSupplier) () -> { return this.leader.getPosition().getValueAsDouble() < 40;
+        return (BooleanSupplier) () -> { return this.leader.getClosedLoopReference().getValueAsDouble() < 40;
         };
          
+    }
+
+    public double convertEncoderToRotation(double encoderValue)
+    {
+        return encoderValue / 2048;
+    }
+
+    public BooleanSupplier finishedMotionMagic()
+    {
+        return (BooleanSupplier) () -> { return (leader.getPosition().getValueAsDouble() >= (m_request.Position - 0.25) && leader.getPosition().getValueAsDouble() <= (m_request.Position + 0.25));
+        };
     }
 
     // public Command RasiseWhileAligning(){
@@ -119,69 +135,106 @@ public class ElevatorSubsystem extends SubsystemBase {
     //     };
     // }
 
-    public Command tempRaiseElevator()
+    public Command raiseElevatorL4()
+    {
+        // return this.runOnce(
+        //     () -> leader.setControl(m_request.withPosition(19))
+        // );
+
+        if (DriveSubsystem.isCloseEnough().getAsBoolean())
+            return run(() -> leader.setControl(m_request.withPosition(19.1))).until(finishedMotionMagic());//19.1
+        else
+            return runOnce(() -> leader.setControl(m_request.withPosition(1.8)));
+        // (() -> leader.setControl(m_request.withPosition(19.1)), () -> leader.setControl(m_request.withPosition(19.1))).onlyWhile(DriveSubsystem.isCloseEnough()).until(finishedMotionMagic());
+    }
+    public Command raiseElevatorL3()
+    {
+        // return this.runOnce(
+        //     () -> leader.setControl(m_request.withPosition(11.25))
+        // );
+
+        return startEnd(() -> leader.setControl(m_request.withPosition(11.25)), () -> leader.setControl(m_request.withPosition(11.25))).onlyWhile(DriveSubsystem.isCloseEnough()).until(finishedMotionMagic());
+
+    }
+    public Command raiseElevatorL2()
+    {
+        // return this.runOnce(
+        //     () -> leader.setControl(m_request.withPosition(7.5))
+        // );
+
+        return startEnd(() -> leader.setControl(m_request.withPosition(7.5)), () -> leader.setControl(m_request.withPosition(7.5))).onlyWhile(DriveSubsystem.isCloseEnough()).until(finishedMotionMagic());
+
+    }
+    public Command raiseElevatorNet()
+    {
+        // return this.runOnce(
+        //     () -> leader.setControl(m_request.withPosition(12))
+        // );
+    
+        return startEnd(() -> leader.setControl(m_request.withPosition(12)), () -> leader.setControl(m_request.withPosition(12))).until(finishedMotionMagic());
+
+    }
+    public Command raiseElevatorCam()
+    {
+        // return this.runOnce(
+        //     () -> leader.setControl(m_request.withPosition(19))
+        // );
+
+        return startEnd(() -> leader.setControl(m_request.withPosition(1.8)), () -> leader.setControl(m_request.withPosition(1.8))).until(finishedMotionMagic());
+    }
+
+
+    public Command lowerElevatorS()
     {
         return this.runOnce(
-            () -> leader.setControl(m_request.withPosition(12))
+            () -> leader.setControl(m_request.withPosition(0))
+        );
+    }
+    public Command lowerElevatorF()
+    {
+        return this.runOnce(
+            () -> leader.setControl(m_request.withPosition(0))
         );
     }
 
-    public Command tempLowerElevator()
+    public Command grabLowAlgae()
     {
         return this.runOnce(
-            () -> leader.setControl(m_request.withPosition(5))
+            () -> leader.setControl(m_request.withPosition(4))
         );
+
+        // if (DriveSubsystem.isCloseEnough().getAsBoolean())
+        //     return run(() -> leader.setControl(m_request.withPosition(16))).until(finishedMotionMagic());//19.1
+        // else
+        //     return runOnce(() -> leader.setControl(m_request.withPosition(1.8)));
     }
 
-    // public Command raiseElevatorIntake() {
-    //     return this.runOnce(
-    //             () -> closedLoopController.setReference(9.5, ControlType.kMAXMotionPositionControl, // 50
-    //                     ClosedLoopSlot.kSlot0));
-    // }
+    public Command grabHighAlage()
+    {
+        return this.runOnce(
+            () -> leader.setControl(m_request.withPosition(8))
+        );
 
-    // public Command raiseElevatorL4() {
-    //     return this.runOnce(
-    //             () -> closedLoopController.setReference(49, ControlType.kMAXMotionPositionControl, // 50
-    //                     ClosedLoopSlot.kSlot0));
-    // }
-
-    // public Command raiseElevatorL3() {
-    //     return this.runOnce(
-    //             () -> closedLoopController.setReference(28.5, ControlType.kMAXMotionPositionControl,
-    //                     ClosedLoopSlot.kSlot0));
-    // }
-
-    // public Command raiseElevatorL2() {
-    //     return this.runOnce(
-    //             () -> closedLoopController.setReference(15.5, ControlType.kMAXMotionPositionControl,
-    //                     ClosedLoopSlot.kSlot0));
-    // }
-
-    // public Command lowerElevator() {
-    //     return this.runOnce(
-    //             () -> closedLoopController.setReference(0, ControlType.kMAXMotionPositionControl,
-    //                     ClosedLoopSlot.kSlot1));
-    // }
-    // public Command raiseElevatorHighAlgae() {
-    //     return this.runOnce(
-    //             () -> closedLoopController.setReference(32, ControlType.kMAXMotionPositionControl,
-    //                     ClosedLoopSlot.kSlot0));
-    // }
-    // public Command raiseElevatorLowAlgae() {
-    //     return this.runOnce(
-    //             () -> closedLoopController.setReference(20, ControlType.kMAXMotionPositionControl,
-    //                     ClosedLoopSlot.kSlot0));
-    // }
-
-    // public int getTargetPosition() {
-    //     return targetPosition;
-    // }
+        // if (DriveSubsystem.isCloseEnough().getAsBoolean())
+        //     return run(() -> leader.setControl(m_request.withPosition(9))).until(finishedMotionMagic());//19.1
+        // else
+        //     return runOnce(() -> leader.setControl(m_request.withPosition(1.8)));
+    }
 
     @Override
     public void periodic() {
         SmartDashboard.putNumber("elevator encoder", leader.getPosition().getValueAsDouble());
+        SmartDashboard.putNumber("target elevator encoder", m_request.Position);
+        SmartDashboard.putBoolean("motionMagicB", finishedMotionMagic().getAsBoolean());
+
+        SmartDashboard.putBoolean("isCloseEnough", DriveSubsystem.isCloseEnough().getAsBoolean());
+
+        // SmartDashboard.putBoolean("motion magic is running", ((BooleanSupplier) leader.getMotionMagicIsRunning()).getAsBoolean());
+
+        // SmartDashboard.putNumber("setpoint",this.leader.getre);
 
         // Logger.getInstance().recordOutput("Elevator", leader.getPosition().getValueAsDouble());
+        // System.out.println(((BooleanSupplier) leader.getMotionMagicIsRunning()).getAsBoolean());
 
     }
 }
