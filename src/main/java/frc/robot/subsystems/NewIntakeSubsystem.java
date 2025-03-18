@@ -104,6 +104,13 @@ public class NewIntakeSubsystem extends SubsystemBase {
         return 
         startEnd(this::intakeFast, this::stopA).until(RobotContainer.newIntakeSubsystem.isAlgaeGripped());
     }
+    public Command alageOut(){
+        return runOnce(() -> leader.set(-0.5));
+    
+    }
+    public Command Stop(){
+        return runOnce(this::stop);
+    }
     public void intake()
     {
         leader.set(0.25);
@@ -112,6 +119,7 @@ public class NewIntakeSubsystem extends SubsystemBase {
     {
         leader.set(0.08);
     }
+   
 
     public void intakeFast()
     {

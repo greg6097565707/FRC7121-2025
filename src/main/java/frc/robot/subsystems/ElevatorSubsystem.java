@@ -3,10 +3,14 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants;
 import frc.robot.LimelightHelpers;
 import frc.robot.RobotContainer;
+import frc.robot.LimelightHelpers;
+import edu.wpi.first.networktables.NetworkTableInstance;
 
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -141,10 +145,13 @@ public class ElevatorSubsystem extends SubsystemBase {
         //     () -> leader.setControl(m_request.withPosition(19))
         // );
 
-        if (DriveSubsystem.isCloseEnough().getAsBoolean())
-            return run(() -> leader.setControl(m_request.withPosition(19.1))).until(finishedMotionMagic());//19.1
-        else
-            return runOnce(() -> leader.setControl(m_request.withPosition(1.8)));
+        // if (DriveSubsystem.isCloseEnough().getAsBoolean())
+        //     return run(() -> leader.setControl(m_request.withPosition(19.1))).until(finishedMotionMagic());//19.1
+        // else
+        //     return runOnce(() -> leader.setControl(m_request.withPosition(1.8)));
+        return run(null).until(() -> DriveSubsystem.isCloseEnough().getAsBoolean())
+        .andThen(run(() -> leader.setControl(m_request.withPosition(19.1))).until(finishedMotionMagic()));
+
         // (() -> leader.setControl(m_request.withPosition(19.1)), () -> leader.setControl(m_request.withPosition(19.1))).onlyWhile(DriveSubsystem.isCloseEnough()).until(finishedMotionMagic());
     }
     public Command raiseElevatorL3()
@@ -153,8 +160,9 @@ public class ElevatorSubsystem extends SubsystemBase {
         //     () -> leader.setControl(m_request.withPosition(11.25))
         // );
 
-        return startEnd(() -> leader.setControl(m_request.withPosition(11.25)), () -> leader.setControl(m_request.withPosition(11.25))).onlyWhile(DriveSubsystem.isCloseEnough()).until(finishedMotionMagic());
-
+        // return startEnd(() -> leader.setControl(m_request.withPosition(11.25)), () -> leader.setControl(m_request.withPosition(11.25))).onlyWhile(DriveSubsystem.isCloseEnough()).until(finishedMotionMagic());
+         return run(null).until(() -> DriveSubsystem.isCloseEnough().getAsBoolean())
+        .andThen(run(() -> leader.setControl(m_request.withPosition(11.25))).until(finishedMotionMagic()));
     }
     public Command raiseElevatorL2()
     {
@@ -162,8 +170,9 @@ public class ElevatorSubsystem extends SubsystemBase {
         //     () -> leader.setControl(m_request.withPosition(7.5))
         // );
 
-        return startEnd(() -> leader.setControl(m_request.withPosition(7.5)), () -> leader.setControl(m_request.withPosition(7.5))).onlyWhile(DriveSubsystem.isCloseEnough()).until(finishedMotionMagic());
-
+        // return startEnd(() -> leader.setControl(m_request.withPosition(7.5)), () -> leader.setControl(m_request.withPosition(7.5))).onlyWhile(DriveSubsystem.isCloseEnough()).until(finishedMotionMagic());
+        return run(null).until(() -> DriveSubsystem.isCloseEnough().getAsBoolean())
+        .andThen(run(() -> leader.setControl(m_request.withPosition(7.5))).until(finishedMotionMagic()));
     }
     public Command raiseElevatorNet()
     {
@@ -171,8 +180,8 @@ public class ElevatorSubsystem extends SubsystemBase {
         //     () -> leader.setControl(m_request.withPosition(12))
         // );
     
-        return startEnd(() -> leader.setControl(m_request.withPosition(12)), () -> leader.setControl(m_request.withPosition(12))).until(finishedMotionMagic());
-
+        // return startEnd(() -> leader.setControl(m_request.withPosition(12)), () -> leader.setControl(m_request.withPosition(12))).until(finishedMotionMagic());
+        return runOnce(() -> leader.setControl(m_request.withPosition(20))).until(finishedMotionMagic());
     }
     public Command raiseElevatorCam()
     {
@@ -184,18 +193,31 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
 
-    public Command lowerElevatorS()
+    public Command lowerElevator()
     {
         return this.runOnce(
             () -> leader.setControl(m_request.withPosition(0))
         );
     }
-    public Command lowerElevatorF()
+    public Command raiseHighAlgaePrep()
     {
-        return this.runOnce(
-            () -> leader.setControl(m_request.withPosition(0))
-        );
+        // return this.runOnce(
+        //     () -> leader.setControl(m_request.withPosition(12))
+        // );
+    
+        // return startEnd(() -> leader.setControl(m_request.withPosition(12)), () -> leader.setControl(m_request.withPosition(12))).until(finishedMotionMagic());
+        return run(() -> leader.setControl(m_request.withPosition(6))).until(finishedMotionMagic());
     }
+    public Command raiseLowAlgaePrep()
+    {
+        // return this.runOnce(
+        //     () -> leader.setControl(m_request.withPosition(12))
+        // );
+    
+        // return startEnd(() -> leader.setControl(m_request.withPosition(12)), () -> leader.setControl(m_request.withPosition(12))).until(finishedMotionMagic());
+        return run(() -> leader.setControl(m_request.withPosition(2))).until(finishedMotionMagic());
+    }
+    
 
     public Command grabLowAlgae()
     {
@@ -220,9 +242,39 @@ public class ElevatorSubsystem extends SubsystemBase {
         // else
         //     return runOnce(() -> leader.setControl(m_request.withPosition(1.8)));
     }
+    public Command DetermineAlgae(){
+        return run(() -> leader.setControl(m_request.withPosition(algaeHeight))).until(finishedMotionMagic());
+    }
+    public Command DetermineAlgaePrep(){
+        return run(() -> leader.setControl(m_request.withPosition(algaePrep))).until(finishedMotionMagic());
+    }
+    public Command Cancel(){
+        return runOnce(() -> CommandScheduler.getInstance().cancelAll());
+    }
+    private double algaeHeight;
+    private double algaePrep;
+  private void updateHeightValue(){
+   double TAGID = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0); 
+   if (TAGID == 10 || TAGID == 21 || TAGID == 19 || TAGID == 17 || TAGID == 8 || TAGID == 6 )
+    {
+      algaeHeight = 4;
+      algaePrep=2.5;
+    }
+    else if (TAGID == 20 || TAGID == 22 || TAGID == 18 || TAGID == 9 || TAGID == 11 || TAGID == 7)
+    {
+        algaeHeight = 8;
+        algaePrep=6;
+    }
+    else {
+        algaeHeight = 0;
+        algaePrep=0;
+    }
+    
+  }
 
     @Override
     public void periodic() {
+        updateHeightValue();
         SmartDashboard.putNumber("elevator encoder", leader.getPosition().getValueAsDouble());
         SmartDashboard.putNumber("target elevator encoder", m_request.Position);
         SmartDashboard.putBoolean("motionMagicB", finishedMotionMagic().getAsBoolean());
