@@ -5,9 +5,22 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "toReef"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "toReef"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "elevatorCam"
+                }
+              }
+            ]
           }
         },
         {
@@ -17,9 +30,28 @@
           }
         },
         {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "to coral"
+                }
+              }
+            ]
+          }
+        },
+        {
           "type": "named",
           "data": {
-            "name": "Score"
+            "name": "RightL4Score"
           }
         },
         {
@@ -29,47 +61,22 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "to coral"
+                  "pathName": "backtoreef"
                 }
               },
               {
-                "type": "sequential",
+                "type": "named",
                 "data": {
-                  "commands": [
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 1.0
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "Intake"
-                      }
-                    }
-                  ]
+                  "name": "Intake"
                 }
               }
             ]
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "backtoreef"
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "LeftL4Score"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Score"
           }
         }
       ]

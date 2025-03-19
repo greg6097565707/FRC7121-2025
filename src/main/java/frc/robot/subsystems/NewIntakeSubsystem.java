@@ -95,7 +95,7 @@ public class NewIntakeSubsystem extends SubsystemBase {
         });
     }
     public Command runIntake(){
-        return startEnd(this::intakeFast, this::stop).withTimeout(0.7);
+        return startEnd(this::outtakeFast, this::stop).withTimeout(0.9);
     }
     public Command ContinousRunIntake(){
         return run(this::intake);
@@ -118,6 +118,10 @@ public class NewIntakeSubsystem extends SubsystemBase {
     public void stopA()
     {
         leader.set(0.08);
+    }
+    public void outtakeFast()
+    {
+        leader.set(0.7);
     }
    
 

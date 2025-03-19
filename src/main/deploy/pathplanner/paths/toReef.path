@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 5.164755794701986,
-        "y": 5.376117549668874
+        "x": 5.15,
+        "y": 5.5
       },
       "prevControl": {
-        "x": 6.032284203792895,
-        "y": 5.625407322396146
+        "x": 6.017528409090909,
+        "y": 5.7492897727272725
       },
       "nextControl": null,
       "isLocked": true,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0.0,
-    "rotation": -120.96375653207367
+    "rotation": 61.420330342574786
   },
   "reversed": false,
   "folder": "farside3coral",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 0.0
   },
   "useDefaultConstraints": false
 }

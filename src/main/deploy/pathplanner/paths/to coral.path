@@ -3,25 +3,41 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.164755794701986,
-        "y": 5.376117549668874
+        "x": 5.15,
+        "y": 5.5
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.5473096026490065,
-        "y": 6.581953642384105
+        "x": 4.5325538079470205,
+        "y": 6.705836092715232
       },
       "isLocked": false,
       "linkedName": "reef"
     },
     {
       "anchor": {
-        "x": 0.9273579545454546,
-        "y": 7.859076704545455
+        "x": 0.7977272727272726,
+        "y": 7.9388494318181815
       },
       "prevControl": {
-        "x": 2.44746425346177,
-        "y": 6.898931366646599
+        "x": 0.9364023217835803,
+        "y": 8.146862005402646
+      },
+      "nextControl": {
+        "x": 0.5642983142805336,
+        "y": 7.588705994148074
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.460142045454545,
+        "y": 5.376117549668874
+      },
+      "prevControl": {
+        "x": 2.413124999999999,
+        "y": 6.193788004214327
       },
       "nextControl": null,
       "isLocked": false,
@@ -30,8 +46,8 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.8062953995157461,
-      "rotationDegrees": -56.736169391820965
+      "waypointRelativePos": 0.799289520426274,
+      "rotationDegrees": 129.27757698306795
     }
   ],
   "constraintZones": [],
@@ -39,7 +55,7 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 5.0,
-    "maxAcceleration": 4.0,
+    "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -47,13 +63,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -55.0079798016348
+    "rotation": 119.39605285494332
   },
   "reversed": false,
   "folder": "farside3coral",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -120.96375653207367
+    "rotation": 61.420330342574786
   },
   "useDefaultConstraints": false
 }

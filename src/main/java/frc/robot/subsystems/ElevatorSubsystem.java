@@ -149,7 +149,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         //     return run(() -> leader.setControl(m_request.withPosition(19.1))).until(finishedMotionMagic());//19.1
         // else
         //     return runOnce(() -> leader.setControl(m_request.withPosition(1.8)));
-        return run(null).until(() -> DriveSubsystem.isCloseEnough().getAsBoolean())
+        return run(() -> leader.setControl(m_request.withPosition(1.8))).until(() -> DriveSubsystem.isCloseEnough().getAsBoolean())
         .andThen(run(() -> leader.setControl(m_request.withPosition(19.1))).until(finishedMotionMagic()));
 
         // (() -> leader.setControl(m_request.withPosition(19.1)), () -> leader.setControl(m_request.withPosition(19.1))).onlyWhile(DriveSubsystem.isCloseEnough()).until(finishedMotionMagic());
@@ -161,8 +161,8 @@ public class ElevatorSubsystem extends SubsystemBase {
         // );
 
         // return startEnd(() -> leader.setControl(m_request.withPosition(11.25)), () -> leader.setControl(m_request.withPosition(11.25))).onlyWhile(DriveSubsystem.isCloseEnough()).until(finishedMotionMagic());
-         return run(null).until(() -> DriveSubsystem.isCloseEnough().getAsBoolean())
-        .andThen(run(() -> leader.setControl(m_request.withPosition(11.25))).until(finishedMotionMagic()));
+         return run(() -> leader.setControl(m_request.withPosition(1.8))).until(() -> DriveSubsystem.isCloseEnough().getAsBoolean())
+        .andThen(run(() -> leader.setControl(m_request.withPosition(12.25))).until(finishedMotionMagic()));
     }
     public Command raiseElevatorL2()
     {
@@ -171,8 +171,8 @@ public class ElevatorSubsystem extends SubsystemBase {
         // );
 
         // return startEnd(() -> leader.setControl(m_request.withPosition(7.5)), () -> leader.setControl(m_request.withPosition(7.5))).onlyWhile(DriveSubsystem.isCloseEnough()).until(finishedMotionMagic());
-        return run(null).until(() -> DriveSubsystem.isCloseEnough().getAsBoolean())
-        .andThen(run(() -> leader.setControl(m_request.withPosition(7.5))).until(finishedMotionMagic()));
+        return run(() -> leader.setControl(m_request.withPosition(1.8))).until(() -> DriveSubsystem.isCloseEnough().getAsBoolean())
+        .andThen(run(() -> leader.setControl(m_request.withPosition(8))).until(finishedMotionMagic()));
     }
     public Command raiseElevatorNet()
     {
@@ -262,8 +262,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
     else if (TAGID == 20 || TAGID == 22 || TAGID == 18 || TAGID == 9 || TAGID == 11 || TAGID == 7)
     {
-        algaeHeight = 8;
-        algaePrep=6;
+        algaeHeight = 8.25;
+        algaePrep=5;
     }
     else {
         algaeHeight = 0;
@@ -278,6 +278,8 @@ public class ElevatorSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("elevator encoder", leader.getPosition().getValueAsDouble());
         SmartDashboard.putNumber("target elevator encoder", m_request.Position);
         SmartDashboard.putBoolean("motionMagicB", finishedMotionMagic().getAsBoolean());
+        SmartDashboard.putNumber("algae", algaeHeight);
+        SmartDashboard.putNumber("algaeP", algaePrep);
 
         SmartDashboard.putBoolean("isCloseEnough", DriveSubsystem.isCloseEnough().getAsBoolean());
 

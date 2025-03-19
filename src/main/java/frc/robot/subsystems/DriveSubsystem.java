@@ -82,15 +82,19 @@ private void announcedone() {
 }
 
 public Command AutoAlignRight() {
-  return run(this::autoAlignDriveRight).until(()->RobotContainer.isAlignedRight().getAsBoolean()).onlyWhile(hasTag());
+  return run(this::autoAlignDriveRight).until(()->RobotContainer.isAlignedRight().getAsBoolean()).withTimeout(3).onlyWhile(() -> hasTag().getAsBoolean());
 }
 public Command AutoAlignLeft() {
-  return run(this::autoAlignDriveLeft).until(()->RobotContainer.isAlignedLeft().getAsBoolean()).onlyWhile(hasTag());
+  return run(this::autoAlignDriveLeft).until(()->RobotContainer.isAlignedLeft().getAsBoolean()).withTimeout(3).onlyWhile(() -> hasTag().getAsBoolean());
 }
 public Command AutoAlignMiddle(){
-  return run(this::autoAlignDriveMiddle).until(()->RobotContainer.isAlignedMiddle().getAsBoolean()).onlyWhile(hasTag());
+  return run(this::autoAlignDriveMiddle).until(()->RobotContainer.isAlignedMiddle().getAsBoolean()).withTimeout(3).onlyWhile(() -> hasTag().getAsBoolean());
   
 }
+public Command AutoAlignRotateTest(){
+  return run(this::autoAlignDriveFar);
+}
+
 //.onlyWhile(hasTagAndIsNotAlignedMiddle()).withTimeout(2).finallyDo(this::autoAlignStop);
 
 
@@ -108,20 +112,20 @@ public void autoAlignDriveRight() {
 public void autoAlignDriveLeft() {
   this.drive(limelightXSpeedAlign(), 
   limelightYSpeedAlignLeft(), 
-  0, 
+  limelightRotateToTarget(), 
   false);
 }
 
 public void autoAlignDriveMiddle() {
   this.drive(limelightXSpeedAlign(), 
   limelightYSpeedAlignmiddle(), 
-  0, 
+  limelightRotateToTarget(), 
   false);
 }
 
 public void autoAlignDriveFar() {
-  this.drive(limelightXSpeedFar(), 
-  limelightYSpeedAlignmiddle(), 
+  this.drive(0, 
+  0, 
   limelightRotateToTarget(), 
   false);
 }
@@ -268,15 +272,15 @@ public void autoAlignStop() {
     }
     else if (TAGID == 10 || TAGID == 21)
     {
-      rotationValue = 180;
+      rotationValue = 0;
     }
     else if (TAGID == 11 || TAGID == 20)
     {
-      rotationValue = 0;
+      rotationValue = -60;
     }
     else if (TAGID == 6 || TAGID == 19)
     {
-      rotationValue = 0;//60
+      rotationValue = -120;//60
     }
   }
   
@@ -307,6 +311,10 @@ public void autoAlignStop() {
     SmartDashboard.putBoolean("alignMiddle", RobotContainer.isAlignedMiddle().getAsBoolean());
     SmartDashboard.putNumber("rotorSpeed", talonFrontLeft.getRotorVelocity().getValueAsDouble());
     SmartDashboard.putBoolean("isClose", isCloseEnough().getAsBoolean());
+
+    Pose3d targetingYSpeed = LimelightHelpers.getBotPose3d_TargetSpace("limelight");
+    SmartDashboard.putNumber("rotationLimelights", targetingYSpeed.getRotation().getY());
+
 
    
     
@@ -467,13 +475,15 @@ public void autoAlignStop() {
     // // this is a hand-tuned number that determines the aggressiveness of our proportional control loop
     // // if it is too high, the robot will oscillate around.
     // // if it is too low, the robot will never reach its targget
-    SmartDashboard.putNumber("rotation", getTrueHeading());
+    double kP = .7;
+    Pose3d targetingYSpeed = LimelightHelpers.getBotPose3d_TargetSpace("limelight");
+    SmartDashboard.putNumber("rotationLimelight", targetingYSpeed.getRotation().getY());
 
-    return ((getTrueHeading() + rotationValue)%180) * (-0.003);
+    return (targetingYSpeed.getRotation().getY()) * kP;
+    // return ((getTrueHeading()+rotationValue)%180) * (-0.011);
 
     // return ((((getTrueHeading() - rotationValue) + 180) % 360 + 360) % 360 - 180) * 0.008;
   }
-
   // alignment Y speed Right
   public static final double autoAlignYoffsetRight = -0.03;
   public static double limelightYSpeedAlignRight()
