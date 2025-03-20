@@ -111,6 +111,13 @@ public class NewIntakeSubsystem extends SubsystemBase {
     public Command Stop(){
         return runOnce(this::stop);
     }
+    public Command IntakeTrough(){
+        return runOnce(this::trough);
+    }
+    public void trough()
+    {
+        leader.set(0.4);
+    }
     public void intake()
     {
         leader.set(0.25);

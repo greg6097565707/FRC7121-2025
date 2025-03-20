@@ -53,7 +53,7 @@ import com.studica.frc.AHRS.BoardAxis;
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
  
-private BooleanSupplier hasTag() {
+public static BooleanSupplier hasTag() {
   if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(0) != -1) {
     return () -> true;
   } else {

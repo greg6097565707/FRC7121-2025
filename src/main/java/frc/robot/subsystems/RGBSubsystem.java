@@ -54,10 +54,10 @@ public class RGBSubsystem extends SubsystemBase {
 
     public void setColor(String color) {
         if (color.equals("green")) {
-            m_blinkinDriver.set(.35);
+            m_blinkinDriver.set(.77);
         }
         if (color.equals("red")) {
-            m_blinkinDriver.set(.77);
+            m_blinkinDriver.set(.61);
         }
     }
 
@@ -94,22 +94,19 @@ public class RGBSubsystem extends SubsystemBase {
     public void periodic() {
         
 
-        if (RobotContainer.controller.isInCoralMode) {
-            mode = "Coral";
-            if(RobotContainer.D_INTAKE_IR.supplier.getAsBoolean() || RobotContainer.newIntakeSubsystem.isAlgaeGripped().getAsBoolean())
-                this.GamePieceIN();
-            else 
-                this.GamePieceOut();
+        if (DriveSubsystem.hasTag().getAsBoolean()) {
+            if (DriveSubsystem.isCloseEnough().getAsBoolean())
+                m_blinkinDriver.set(.35);
+
+            else
+                setColor("green");
+
         }
         else {
-            mode = "Algae";
-            if(RobotContainer.D_INTAKE_IR.supplier.getAsBoolean() || RobotContainer.newIntakeSubsystem.isAlgaeGripped().getAsBoolean())
-                this.GamePieceIN();
-            else 
-                this.GamePieceOut();
+            setColor("red");
         }
 
-        SmartDashboard.putString("Robot Mode", mode);
+        // SmartDashboard.putString("Robot Mode", mode);
         
     }
 }

@@ -155,7 +155,9 @@ public final class Constants {
 
   public static final class IntakeConstants {
     public static final int rightMotorID = 12;
-    public static final int leftMotorID = 13;
+    
   }
+  public static final class ClimbConstants {
+    public static final int MotorID = 13;}
 
 }

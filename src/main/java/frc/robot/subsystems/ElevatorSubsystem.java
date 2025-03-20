@@ -242,6 +242,9 @@ public class ElevatorSubsystem extends SubsystemBase {
         // else
         //     return runOnce(() -> leader.setControl(m_request.withPosition(1.8)));
     }
+    public Command trough(){
+        return runOnce(()-> leader.setControl(m_request.withPosition(10)));
+    }
     public Command DetermineAlgae(){
         return run(() -> leader.setControl(m_request.withPosition(algaeHeight))).until(finishedMotionMagic());
     }
