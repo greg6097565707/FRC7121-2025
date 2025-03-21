@@ -113,8 +113,9 @@ public class ControllerSubsystem extends SubsystemBase{
         SmartDashboard.putString("Coral Mode", String.valueOf(isInCoralMode));
 
 
-        // if (DriveSubsystem.hasTag().getAsBoolean()) {
-        //     rumble();
+        
+        // else {
+        //     stopRumble();
         // }
 
     }

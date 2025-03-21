@@ -88,13 +88,13 @@ private void announcedone() {
 }
 
 public Command AutoAlignRight() {
-  return run(this::autoAlignDriveRight).until(()->RobotContainer.isAlignedRight().getAsBoolean() || !hasTag().getAsBoolean()).withTimeout(3);
+  return run(this::autoAlignDriveRight).until(()->RobotContainer.isAlignedRight().getAsBoolean()).withTimeout(3);
 }
 public Command AutoAlignLeft() {
-  return run(this::autoAlignDriveLeft).until(()->RobotContainer.isAlignedLeft().getAsBoolean() || !hasTag().getAsBoolean()).withTimeout(3);
+  return run(this::autoAlignDriveLeft).until(()->RobotContainer.isAlignedLeft().getAsBoolean()).withTimeout(3);
 }
 public Command AutoAlignMiddle(){
-  return run(this::autoAlignDriveMiddle).until(()->RobotContainer.isAlignedMiddle().getAsBoolean() || !hasTag().getAsBoolean()).withTimeout(3);
+  return run(this::autoAlignDriveMiddle).until(()->RobotContainer.isAlignedMiddle().getAsBoolean()).withTimeout(3);
   
 }
 public Command AutoAlignRotateTest(){

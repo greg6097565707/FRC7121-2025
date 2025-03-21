@@ -84,6 +84,9 @@ public class RobotContainer {
   Trigger rTButton;
   Trigger lTButton;
 
+  Trigger hasTag;
+  Trigger isCloseEnough;
+
   Trigger secondRTButton;
   Trigger secondLTButton;
 
@@ -263,7 +266,16 @@ public static BooleanSupplier isInIntakeZone(){
       { return m_driverController.getLeftTriggerAxis() > 0.5;}
       );
 
+    hasTag = new Trigger(() -> 
+    {
+      return DriveSubsystem.hasTag().getAsBoolean();
+  });
 
+  isCloseEnough = new Trigger(() -> 
+  {
+    return DriveSubsystem.isCloseEnough().getAsBoolean();
+});
+    
     
 
     algaeMode = new Trigger(() ->
@@ -286,6 +298,10 @@ public static BooleanSupplier isInIntakeZone(){
         // .onTrue(newIntakeSubsystem.runIntake());
         // new JoystickButton(m_driverController, XboxController.Button.kB.value)
         // .onTrue(m_robotDrive.AutoAlignMiddle());
+
+        hasTag.and(isCloseEnough)
+        .whileTrue(controller.rumble()).onFalse(controller.stopRumble());
+        // .onFalse(controller.stopRumble());
 
         new JoystickButton(m_driverController, XboxController.Button.kRightStick.value)
         .toggleOnTrue(m_robotDrive.setDriveSpeed(.5))
