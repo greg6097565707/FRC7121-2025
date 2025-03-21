@@ -60,6 +60,24 @@ public class ControllerSubsystem extends SubsystemBase{
             ).andThen(new WaitCommand(.5).andThen(stopRumble()));
     }
 
+    public Command longBlip()
+    {
+        return runOnce(
+            () -> {
+                controller.setRumble(RumbleType.kBothRumble, 1);
+            }
+            ).andThen(new WaitCommand(1).andThen(stopRumble()));
+    }
+
+    public Command tinyBlip()
+    {
+        return runOnce(
+            () -> {
+                controller.setRumble(RumbleType.kBothRumble, 1);
+            }
+            ).andThen(new WaitCommand(.25).andThen(stopRumble()));
+    }
+
     public Command switchToCoral()
     {
         // robotContainer.configureButtonBindings();
@@ -93,6 +111,12 @@ public class ControllerSubsystem extends SubsystemBase{
     @Override
     public void periodic() {
         SmartDashboard.putString("Coral Mode", String.valueOf(isInCoralMode));
+
+
+        // if (DriveSubsystem.hasTag().getAsBoolean()) {
+        //     rumble();
+        // }
+
     }
 
 

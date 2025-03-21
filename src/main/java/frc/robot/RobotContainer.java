@@ -287,6 +287,12 @@ public static BooleanSupplier isInIntakeZone(){
         // new JoystickButton(m_driverController, XboxController.Button.kB.value)
         // .onTrue(m_robotDrive.AutoAlignMiddle());
 
+        new JoystickButton(m_driverController, XboxController.Button.kRightStick.value)
+        .toggleOnTrue(m_robotDrive.setDriveSpeed(.5))
+        .toggleOnFalse(m_robotDrive.setDriveSpeed(1.0))
+        .onTrue(controller.longBlip())
+        .onFalse(controller.blip());
+
 
         // left side coral
         new JoystickButton(m_driverController, XboxController.Button.kY.value).and(rTButton.negate()).and(new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value).negate())

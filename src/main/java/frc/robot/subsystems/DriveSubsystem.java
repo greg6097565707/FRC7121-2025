@@ -50,7 +50,13 @@ import com.studica.frc.AHRS.BoardAxis;
 
 
 
+
+
+
+
 public class DriveSubsystem extends SubsystemBase {
+
+  public double driveSpeed = 1.0;
   // Create MAXSwerveModules
  
 public static BooleanSupplier hasTag() {
@@ -82,13 +88,13 @@ private void announcedone() {
 }
 
 public Command AutoAlignRight() {
-  return run(this::autoAlignDriveRight).until(()->RobotContainer.isAlignedRight().getAsBoolean()).withTimeout(3).onlyWhile(() -> hasTag().getAsBoolean());
+  return run(this::autoAlignDriveRight).until(()->RobotContainer.isAlignedRight().getAsBoolean() || !hasTag().getAsBoolean()).withTimeout(3);
 }
 public Command AutoAlignLeft() {
-  return run(this::autoAlignDriveLeft).until(()->RobotContainer.isAlignedLeft().getAsBoolean()).withTimeout(3).onlyWhile(() -> hasTag().getAsBoolean());
+  return run(this::autoAlignDriveLeft).until(()->RobotContainer.isAlignedLeft().getAsBoolean() || !hasTag().getAsBoolean()).withTimeout(3);
 }
 public Command AutoAlignMiddle(){
-  return run(this::autoAlignDriveMiddle).until(()->RobotContainer.isAlignedMiddle().getAsBoolean()).withTimeout(3).onlyWhile(() -> hasTag().getAsBoolean());
+  return run(this::autoAlignDriveMiddle).until(()->RobotContainer.isAlignedMiddle().getAsBoolean() || !hasTag().getAsBoolean()).withTimeout(3);
   
 }
 public Command AutoAlignRotateTest(){
@@ -96,6 +102,14 @@ public Command AutoAlignRotateTest(){
 }
 
 //.onlyWhile(hasTagAndIsNotAlignedMiddle()).withTimeout(2).finallyDo(this::autoAlignStop);
+
+public Command setDriveSpeed(double newSpeed) {
+  return run(
+    () -> {
+      driveSpeed = newSpeed;
+    }
+  );
+}
 
 
 
@@ -315,6 +329,9 @@ public void autoAlignStop() {
     Pose3d targetingYSpeed = LimelightHelpers.getBotPose3d_TargetSpace("limelight");
     SmartDashboard.putNumber("rotationLimelights", targetingYSpeed.getRotation().getY());
 
+    SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
+
+    SmartDashboard.putBoolean("Crouched", (driveSpeed <= 0.5));
 
    
     
@@ -384,9 +401,9 @@ public void autoAlignStop() {
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
     // Convert the commanded speeds into the correct units for the drivetrain
-    double xSpeedDelivered = xSpeed * DriveConstants.kMaxSpeedMetersPerSecond;
-    double ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond;
-    double rotDelivered = rot * DriveConstants.kMaxAngularSpeed;
+    double xSpeedDelivered = xSpeed * DriveConstants.kMaxSpeedMetersPerSecond * driveSpeed;
+    double ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond * driveSpeed;
+    double rotDelivered = rot * DriveConstants.kMaxAngularSpeed * driveSpeed;
 
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
         fieldRelative
@@ -510,7 +527,7 @@ public void autoAlignStop() {
     return (targetingYSpeed.getX()+autoAlignYoffsetMiddle) * kP;
   }
   //xalign
-  public static final double autoAlignXoffset = .59;
+  public static final double autoAlignXoffset = .57;
   public static double limelightXSpeedAlign()
   {
     double kP = .3;

@@ -104,6 +104,7 @@ public class RGBSubsystem extends SubsystemBase {
         }
         else {
             setColor("red");
+            
         }
 
         // SmartDashboard.putString("Robot Mode", mode);
