@@ -95,7 +95,9 @@ public class NewIntakeSubsystem extends SubsystemBase {
         });
     }
     public Command runIntake(){
-        return startEnd(this::outtakeFast, this::stop).withTimeout(0.9);
+        return startEnd(this::outtakeFast, this::stop).until(() -> {
+            return !RobotContainer.D_INTAKE_IR.supplier.getAsBoolean();
+        });
     }
     public Command ContinousRunIntake(){
         return run(this::intake);

@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "elevatorCam"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "neartoreef"
@@ -13,45 +19,19 @@
         {
           "type": "named",
           "data": {
-            "name": "LeftL4Score"
+            "name": "RightL4Score"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "neartozone"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Score"
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "neartozone"
-                }
-              },
-              {
-                "type": "sequential",
-                "data": {
-                  "commands": [
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 1.0
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "Intake"
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
+            "name": "Intake"
           }
         },
         {
@@ -64,12 +44,6 @@
           "type": "named",
           "data": {
             "name": "RightL4Score"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Score"
           }
         }
       ]

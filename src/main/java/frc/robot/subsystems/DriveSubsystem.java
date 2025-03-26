@@ -502,7 +502,7 @@ public void autoAlignStop() {
     // return ((((getTrueHeading() - rotationValue) + 180) % 360 + 360) % 360 - 180) * 0.008;
   }
   // alignment Y speed Right
-  public static final double autoAlignYoffsetRight = -0.03;
+  public static final double autoAlignYoffsetRight = -0.034;
   public static double limelightYSpeedAlignRight()
   {
     double kP = -.3;
@@ -511,7 +511,7 @@ public void autoAlignStop() {
   }
 
   // alignment spped Y left
-  public static final double autoAlignYoffsetLeft = .29;
+  public static final double autoAlignYoffsetLeft = .297;
   public static double limelightYSpeedAlignLeft()
   {
     double kP = -.3;

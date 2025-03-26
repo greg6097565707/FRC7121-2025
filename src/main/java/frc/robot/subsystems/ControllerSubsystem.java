@@ -28,7 +28,7 @@ public class ControllerSubsystem extends SubsystemBase{
     {
         return runOnce(
             () -> {
-                controller.setRumble(RumbleType.kBothRumble, 1);
+                controller.setRumble(RumbleType.kBothRumble, .5);
             }
             );
     }

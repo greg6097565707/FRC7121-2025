@@ -5,22 +5,15 @@
     "data": {
       "commands": [
         {
-          "type": "parallel",
+          "type": "named",
           "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "toReef"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "elevatorCam"
-                }
-              }
-            ]
+            "name": "elevatorCam"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "toReef"
           }
         },
         {
