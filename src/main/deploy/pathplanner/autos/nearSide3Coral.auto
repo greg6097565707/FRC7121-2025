@@ -17,7 +17,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "toReef"
+                  "pathName": "neartoreef"
                 }
               }
             ]
@@ -36,7 +36,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "to coral"
+                  "pathName": "reef1"
                 }
               },
               {
@@ -74,7 +74,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "backtoreef"
+                  "pathName": "neartozone"
                 }
               },
               {

@@ -64,7 +64,7 @@ public class NewIntakeSubsystem extends SubsystemBase {
     }
     public BooleanSupplier isAlgaeGripped(){
         return (BooleanSupplier) () -> {
-            if (this.leader.getOutputCurrent() > 16)
+            if (this.leader.getOutputCurrent() > 10)
                 if (this.consecutive_algae > 10)
                     return true;
                 else {
@@ -105,6 +105,10 @@ public class NewIntakeSubsystem extends SubsystemBase {
     public Command intakeAlgae(){
         return 
         startEnd(this::intakeFast, this::stopA).until(RobotContainer.newIntakeSubsystem.isAlgaeGripped());
+    }
+    public Command AlgaeOutA(){
+        return 
+        startEnd(() -> leader.set(-0.5), () -> leader.set(0)).withTimeout(2);
     }
     public Command alageOut(){
         return runOnce(() -> leader.set(-0.5));

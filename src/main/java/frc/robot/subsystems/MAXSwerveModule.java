@@ -95,6 +95,8 @@ public class MAXSwerveModule {
     TalonFXConfigs.Slot0.kD = ModuleConstants.kDrivingD;
     TalonFXConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     TalonFXConfigs.Feedback.SensorToMechanismRatio = (ModuleConstants.kDrivingMotorReduction / ModuleConstants.kWheelCircumferenceMeters);
+    TalonFXConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
+    TalonFXConfigs.CurrentLimits.StatorCurrentLimit = 40;
     m_drivingTalonFX.getConfigurator().apply(TalonFXConfigs);
     // m_drivingEncoder.setPosition(0);
   }

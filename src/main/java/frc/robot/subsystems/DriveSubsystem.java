@@ -57,6 +57,7 @@ import com.studica.frc.AHRS.BoardAxis;
 public class DriveSubsystem extends SubsystemBase {
 
   public double driveSpeed = 1.0;
+  public boolean isSprinting = false;
   // Create MAXSwerveModules
  
 public static BooleanSupplier hasTag() {
@@ -104,6 +105,13 @@ public Command AutoAlignRotateTest(){
 //.onlyWhile(hasTagAndIsNotAlignedMiddle()).withTimeout(2).finallyDo(this::autoAlignStop);
 
 public Command setDriveSpeed(double newSpeed) {
+  // isSprinting = !isSprinting;
+
+  // if (isSprinting)
+  //   driveSpeed = 1;
+  // else
+  //   driveSpeed = 0.5;
+
   return run(
     () -> {
       driveSpeed = newSpeed;
@@ -401,9 +409,9 @@ public void autoAlignStop() {
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
     // Convert the commanded speeds into the correct units for the drivetrain
-    double xSpeedDelivered = xSpeed * DriveConstants.kMaxSpeedMetersPerSecond * driveSpeed;
-    double ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond * driveSpeed;
-    double rotDelivered = rot * DriveConstants.kMaxAngularSpeed * driveSpeed;
+    double xSpeedDelivered = xSpeed * DriveConstants.kMaxSpeedMetersPerSecond;
+    double ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond;
+    double rotDelivered = rot * DriveConstants.kMaxAngularSpeed;
 
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
         fieldRelative
@@ -505,21 +513,21 @@ public void autoAlignStop() {
   public static final double autoAlignYoffsetRight = -0.034;
   public static double limelightYSpeedAlignRight()
   {
-    double kP = -.3;
+    double kP = -.31;
     Pose3d targetingYSpeed = LimelightHelpers.getBotPose3d_TargetSpace("limelight");
     return (targetingYSpeed.getX()+autoAlignYoffsetRight) * kP;
   }
 
   // alignment spped Y left
-  public static final double autoAlignYoffsetLeft = .297;
+  public static final double autoAlignYoffsetLeft = .32;
   public static double limelightYSpeedAlignLeft()
   {
-    double kP = -.3;
+    double kP = -.31;
     Pose3d targetingYSpeed = LimelightHelpers.getBotPose3d_TargetSpace("limelight");
     return (targetingYSpeed.getX()+autoAlignYoffsetLeft) * kP;
   }
   //align middle
-  public static final double autoAlignYoffsetMiddle = .11;
+  public static final double autoAlignYoffsetMiddle = .17;
   public static double limelightYSpeedAlignmiddle()
   {
     double kP = -0.3;

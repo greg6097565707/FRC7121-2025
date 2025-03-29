@@ -3,41 +3,41 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.15,
-        "y": 5.5
+        "x": 5.215142045454546,
+        "y": 5.475866477272728
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.5325538079470205,
-        "y": 6.705836092715232
+        "x": 4.597695853401566,
+        "y": 6.6817025699879595
       },
       "isLocked": false,
       "linkedName": "reef"
     },
     {
       "anchor": {
-        "x": 0.5584090909090909,
-        "y": 7.430298295454545
+        "x": 0.7678124999999999,
+        "y": 7.69953125
       },
       "prevControl": {
-        "x": 0.6970841399653985,
-        "y": 7.638310869039009
+        "x": 2.19375,
+        "y": 6.5527982954545445
       },
       "nextControl": {
-        "x": 0.3249801324623518,
-        "y": 7.0801548577844375
+        "x": 0.4398795193704004,
+        "y": 7.9632535770797475
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.460142045454545,
-        "y": 5.376117549668874
+        "x": 3.7592897727272727,
+        "y": 5.336264204545455
       },
       "prevControl": {
-        "x": 2.413124999999999,
-        "y": 6.193788004214327
+        "x": 2.712272727272727,
+        "y": 6.1539346590909085
       },
       "nextControl": null,
       "isLocked": false,
@@ -50,12 +50,39 @@
       "rotationDegrees": 129.27757698306795
     }
   ],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.8818897637795297,
+      "maxWaypointRelativePos": 1.363329583802016,
+      "constraints": {
+        "maxVelocity": 0.75,
+        "maxAcceleration": 6.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    },
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0,
+      "maxWaypointRelativePos": 0.17547806524184334,
+      "constraints": {
+        "maxVelocity": 6.0,
+        "maxAcceleration": 2.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 5.0,
-    "maxAcceleration": 3.0,
+    "maxVelocity": 6.0,
+    "maxAcceleration": 5.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -69,7 +96,7 @@
   "folder": "farside3coral",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 61.420330342574786
+    "rotation": 60.32106970814284
   },
   "useDefaultConstraints": false
 }

@@ -191,6 +191,14 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         return startEnd(() -> leader.setControl(m_request.withPosition(1.8)), () -> leader.setControl(m_request.withPosition(1.8))).until(finishedMotionMagic());
     }
+    public Command raiseElevatorCamA()
+    {
+        // return this.runOnce(
+        //     () -> leader.setControl(m_request.withPosition(19))
+        // );
+
+        return runOnce(()->leader.setControl(m_request.withPosition(1.8)));
+    }
 
 
     public Command lowerElevator()
